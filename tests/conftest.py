@@ -10,10 +10,11 @@ fake = Faker()
 
 @pytest.fixture
 def user_data():
-    data = {"email": fake.email(),
-            "password": "TestPassword123!",
-            "name": fake.name()
-            }
+    data = {
+        "email": fake.email(),
+        "password": "TestPassword123!",
+        "name": fake.name()
+    }
     return data
 
 
@@ -37,3 +38,12 @@ def registered_user(user_data):
     return registered_user_data
 
 
+@pytest.fixture
+def products():
+    response = requests.get(f"{BASE_URL}/v1/products")
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    return response_data["products"]
