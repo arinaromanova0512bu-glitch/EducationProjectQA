@@ -1,9 +1,0 @@
-.git
-.idea
-.vscode
-.cursor
-*.md
-.tmp
-/tmp
-web/node_modules
-web/dist
