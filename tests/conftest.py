@@ -24,4 +24,16 @@ def registered_user(user_data):
         json=user_data
     )
     assert response.status_code == 200
-    return user_data
+    response_data = response.json()
+
+    registered_user_data = {
+        "id": response_data["user"]["id"],
+        "email": response_data["user"]["email"],
+        "name": response_data["user"]["name"],
+        "password": user_data["password"],
+        "access_token": response_data["accessToken"]
+    }
+
+    return registered_user_data
+
+
