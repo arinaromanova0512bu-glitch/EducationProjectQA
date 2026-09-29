@@ -1,345 +1,92 @@
 # EducationProjectQA
 
-Project for training Auto QA skills with API (REST + gRPC), Database, UI, Queues.
+API test automation project for an e-commerce backend, created as part of my QA Automation training.
 
-**QA mentees:** API reference → [`Docs.MD`](Docs.MD) · What changed per iteration → [`RELEASE.md`](RELEASE.md).
+The repository contains automated REST API tests covering authentication and user management functionality, including positive and negative scenarios.
 
-## Store API Simulator
+## Tech Stack
 
-gRPC store backend with a JSON HTTP gateway. Catalog, cart, order, user, and admin promocode services backed by **PostgreSQL**.
+- Python 3.11
+- pytest
+- requests
+- Faker
+- REST API
 
-## Features
+## Test Coverage
 
-- **Users** — register, login (JWT + role), get user by ID
-- **Catalog** — list/search/filter/sort products, categories (public)
-- **Delivery** — user addresses CRUD, pickup points; required on checkout
-- **Cart** — add/remove items, get/clear cart, apply/clear promocode, 30m TTL (**JWT required**)
-- **Orders** — create from cart with delivery, get, cancel, update status, **hard delete**; auto `PAID`→`SHIPPED`→`COMPLETED` via **DB job queue** (**JWT required**)
-- **Admin promocodes** — CRUD under `/v1/admin/promocodes` (**admin JWT**)
-- **Admin order jobs** — `GET /v1/admin/orders/{id}/jobs` (**admin JWT**)
-- **Web UI** — Vue 3 SPA (login / catalog / cart / checkout / orders); Docker: `http://localhost:8081/`, local `go run`: `:8080`
-- **Dual transport** — native gRPC (`:50051`) and REST/JSON via grpc-gateway (Docker host `:8081`, process `:8080`)
-- **PostgreSQL** — persistent storage via `pgx` + `database/sql`
+### Authentication
 
-## Requirements
-
-- Go **1.26+**
-- Docker & Docker Compose (Postgres runs in Docker — no local Postgres install needed)
-- For UI local build: Node.js **20+** (npm)
-- For codegen: `protoc`, `protoc-gen-go`, `protoc-gen-go-grpc`, `protoc-gen-grpc-gateway`
-
-## Quick start
-
-### Docker (API + Postgres)
-
-```bash
-docker compose down -v
-docker compose up --build
-```
-
-Use `-v` when schema migrations changed so init scripts re-run on a fresh volume.
-
-- gRPC: `localhost:50051`
-- HTTP API + UI (Docker): `localhost:8081` (UI at `/`, REST under `/v1/...`)
-- Postgres: `localhost:5432` (user/password/db: `store` / `store` / `store`)
-
-### Local (API on host, Postgres in Docker)
-
-```bash
-docker compose up -d postgres
-cd web && npm install && npm run build && cd ..
-DATABASE_URL='postgres://store:store@localhost:5432/store?sslmode=disable' \
-JWT_SECRET='dev-secret-change-me' \
-go run ./cmd/server
-```
-
-UI dev server (hot reload, proxies `/v1` → `:8080`):
-
-```bash
-# terminal 1: API
-docker compose up -d postgres
-DATABASE_URL='postgres://store:store@localhost:5432/store?sslmode=disable' go run ./cmd/server
-
-# terminal 2: Vue
-cd web && npm install && npm run dev
-```
-
-Defaults if unset:
-
-- `DATABASE_URL` → `postgres://store:store@localhost:5432/store?sslmode=disable`
-- `JWT_SECRET` → `dev-secret-change-me`
-- `WEB_DIR` → `web/dist` (Vite production build output)
-- `ORDER_STATUS_DELAY` → `10m` (Docker Compose demo sets `30s`)
-- `ORDER_JOB_POLL_INTERVAL` → `2s`
-
-UI: open `http://localhost:8081/` with Docker, or `http://localhost:8080/` when running `go run ./cmd/server` locally.
-
-## Project layout
-
-```
-cmd/server/          # entrypoint (gRPC + HTTP gateway + UI)
-web/                 # Vue 3 + Vite SPA (build → web/dist)
-proto/               # Catalog, Cart, Order, User, Promo contracts
-gen/                 # generated Go / gRPC / gateway code
-migrations/          # Postgres schema + seed (applied on first DB init)
-internal/
-  auth/              # JWT manager + gRPC interceptor
-  handler/           # gRPC handlers
-  service/           # business logic
-  repository/        # models + postgres repos
-third_party/         # googleapis for HTTP annotations
-```
-
-## Seed catalog
-
-50 products: **15 Apple**, **15 Samsung**, **10 NVIDIA**, **10 AMD** (`brand` field: `apple` / `samsung` / `nvidia` / `amd`).
-
-| Brand   | ID range (suffix) | Examples |
-|---------|-------------------|----------|
-| Apple   | `...001`–`...015` | iPhone 15, MacBook Pro 14 M3, AirPods Pro 2 |
-| Samsung | `...016`–`...030` | Galaxy S24 Ultra, Odyssey G9, 990 PRO |
-| NVIDIA  | `...031`–`...040` | RTX 4090, RTX 4070 SUPER, Jetson Orin Nano |
-| AMD     | `...041`–`...050` | Ryzen 9 7950X, RX 7900 XTX, EPYC 9654 |
-
-Full UUID prefix: `550e8400-e29b-41d4-a716-44665544` + `0001`…`0050`.
-
-## Auth
-
-- **Public:** Catalog, pickup points, `POST /v1/users/register`, `POST /v1/users/login`, `GET /v1/users/{user_id}`
-- **Protected:** Cart, Order, Addresses, `DELETE /v1/users/{user_id}` — `Authorization: Bearer <access_token>`
-- **Admin:** Promo CRUD, order jobs — JWT with `role=admin`
-- Access token TTL: **24h** (HS256, `JWT_SECRET`); claims include `role`
-- Path/body `user_id` on cart/order must match JWT `sub` (unless admin where noted)
-- `DELETE /v1/users/{user_id}` removes terminal orders (`COMPLETED` / `CANCELLED`); blocked if any active order remains
-- Seeded admin: `admin@store.local` / `admin123`
-
-## Pricing rules (cart)
-
-- **Subtotal** — sum of catalog prices × qty
-- **Combo discount** — if cart has ≥1 `brand=nvidia` **and** ≥1 product whose name contains `iPhone` → **10%** off subtotal
-- **Promocode** — applied via API; case-insensitive codes; **does not stack** with combo (promo wins)
-- **ClearCart** — clears items and promocode
-- **Cart TTL** — **30 minutes** of inactivity; refreshed on add/remove/clear/apply/clear promocode (not on get)
-- Seeded codes: `SAVE10` (10%), `FLAT500` (500¢), `WELCOME` (15%)
-
-Cart response includes `subtotalCents`, `discountCents`, `totalPriceCents`, `appliedPromocode`, `comboDiscountApplied`, `expiresAt`.
-
-## Delivery
-
-| Method | Required field | Fee |
-|--------|----------------|-----|
-| `COURIER` (`DELIVERY_METHOD_COURIER`) | `address_id` | **29900** cents; **0** if cart subtotal ≥ **500000** |
-| `PICKUP` (`DELIVERY_METHOD_PICKUP`) | `pickup_point_id` | **0** |
-
-Order stores a **delivery snapshot** (JSON) so later address edits do not rewrite history. Order `totalAmountCents` = merchandise (combo rules as before) + `deliveryFeeCents`. Promocode does not discount delivery.
-
-Seed pickup points: `660e8400-e29b-41d4-a716-446655440001`…`0005` (active); `…0006` inactive for negative tests.
-
-## Order status
-
-| Status | How |
-|--------|-----|
-| `CREATED` | `POST /v1/orders` (delivery fields required) |
-| `PAID` | `POST /v1/orders/{id}/status` with `fromStatus=CREATED`, `toStatus=PAID` → enqueues job |
-| `CANCELLED` | `POST /v1/orders/{id}/cancel` or status update `CREATED`→`CANCELLED` |
-| `SHIPPED` | background worker after `ORDER_STATUS_DELAY` from `PAID` |
-| `COMPLETED` | background worker after another `ORDER_STATUS_DELAY` from `SHIPPED` |
-
-`GET` / `ListOrders` are **read-only** (no status side effects). Manual transitions other than `CREATED`→`PAID` / `CREATED`→`CANCELLED` are rejected (`FailedPrecondition`). `fromStatus` must match the current status.
-
-## HTTP API
-
-Base URL: `http://localhost:8080`
+- User registration
+- User login
+- Validation of required fields
+- Invalid credentials
+- Invalid registration data
+- Authentication error scenarios
 
 ### Users
 
-```http
-POST   /v1/users/register
-POST   /v1/users/login
-GET    /v1/users/{user_id}
-DELETE /v1/users/{user_id}
+- Get user by ID
+- Delete user
+- Authorization checks
+- Requests without an access token
+- Requests with an invalid access token
+- Access to another user's data
+- Requests for non-existent users
+- Repeated user deletion
+
+## Project Structure
+
+```text
+tests/
+├── api_client.py
+├── conftest.py
+├── test_auth.py
+└── test_users.py
 ```
 
-### Catalog (public)
+- `api_client.py` — API configuration
+- `conftest.py` — shared pytest fixtures and test data
+- `test_auth.py` — authentication and registration tests
+- `test_users.py` — user management tests
 
-```http
-GET /v1/products
-GET /v1/products/{product_id}
-GET /v1/categories
-GET /v1/categories/{category_id}
-```
+## Running the Tests
 
-`GET /v1/products` query: `q`, `brand`, `category_id`, `min_price_cents`, `max_price_cents`, `in_stock`, `sort` (`price_asc`\|`price_desc`\|`name_asc`\|`name_desc`), `page_size` (default 20, max 50), `page_token`.
-
-### Delivery
-
-```http
-GET    /v1/users/{user_id}/addresses
-POST   /v1/users/{user_id}/addresses
-GET    /v1/users/{user_id}/addresses/{address_id}
-PATCH  /v1/users/{user_id}/addresses/{address_id}
-DELETE /v1/users/{user_id}/addresses/{address_id}
-GET    /v1/pickup-points
-GET    /v1/pickup-points/{pickup_point_id}
-```
-
-Addresses require JWT (owner or admin). Pickup list/get are public (active points only on list).
-
-### Cart (JWT)
-
-```http
-GET    /v1/users/{user_id}/cart
-POST   /v1/users/{user_id}/cart/items
-DELETE /v1/users/{user_id}/cart/items/{product_id}
-DELETE /v1/users/{user_id}/cart
-POST   /v1/users/{user_id}/cart/promocode
-DELETE /v1/users/{user_id}/cart/promocode
-```
-
-Add item:
-
-```json
-{ "product_id": "550e8400-e29b-41d4-a716-446655440001", "quantity": 1 }
-```
-
-Apply promocode:
-
-```json
-{ "code": "SAVE10" }
-```
-
-### Orders (JWT)
-
-```http
-POST   /v1/orders
-GET    /v1/users/{user_id}/orders
-GET    /v1/orders/{order_id}
-POST   /v1/orders/{order_id}/cancel
-POST   /v1/orders/{order_id}/status
-DELETE /v1/orders/{order_id}
-GET    /v1/admin/orders/{order_id}/jobs
-```
-
-Create:
-
-```json
-{
-  "user_id": "<uuid>",
-  "deliveryMethod": "DELIVERY_METHOD_COURIER",
-  "addressId": "<address-uuid>"
-}
-```
-
-Pickup:
-
-```json
-{
-  "user_id": "<uuid>",
-  "deliveryMethod": "DELIVERY_METHOD_PICKUP",
-  "pickupPointId": "660e8400-e29b-41d4-a716-446655440001"
-}
-```
-
-Update status:
-
-```json
-{ "fromStatus": "ORDER_STATUS_CREATED", "toStatus": "ORDER_STATUS_PAID" }
-```
-
-(grpc-gateway may also accept numeric enum values.)
-
-### Admin promocodes (admin JWT)
-
-```http
-GET    /v1/admin/promocodes
-POST   /v1/admin/promocodes
-PATCH  /v1/admin/promocodes/{code}
-DELETE /v1/admin/promocodes/{code}
-```
-
-Create body:
-
-```json
-{
-  "code": "SPRING20",
-  "discountType": "DISCOUNT_TYPE_PERCENT",
-  "discountValue": "20",
-  "active": true
-}
-```
-
-### Example flow
+Install the required dependencies:
 
 ```bash
-# Admin login
-ADMIN_TOKEN=$(curl -s http://localhost:8080/v1/users/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"admin@store.local","password":"admin123"}' | jq -r .accessToken)
-
-# Register user
-curl -s http://localhost:8080/v1/users/register \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"qa@example.com","password":"secret123","name":"QA"}'
-
-TOKEN=$(curl -s http://localhost:8080/v1/users/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"qa@example.com","password":"secret123"}' | jq -r .accessToken)
-USER_ID=$(curl -s http://localhost:8080/v1/users/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"qa@example.com","password":"secret123"}' | jq -r .user.id)
-
-# Add iPhone + NVIDIA GPU, apply promo
-curl -X POST "http://localhost:8080/v1/users/${USER_ID}/cart/items" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H 'Content-Type: application/json' \
-  -d '{"product_id":"550e8400-e29b-41d4-a716-446655440001","quantity":1}'
-
-curl -X POST "http://localhost:8080/v1/users/${USER_ID}/cart/items" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H 'Content-Type: application/json' \
-  -d '{"product_id":"550e8400-e29b-41d4-a716-446655440031","quantity":1}'
-
-curl -X POST "http://localhost:8080/v1/users/${USER_ID}/cart/promocode" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H 'Content-Type: application/json' \
-  -d '{"code":"SAVE10"}'
-
-ORDER_ID=$(curl -s -X POST http://localhost:8080/v1/orders \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H 'Content-Type: application/json' \
-  -d "{\"user_id\":\"${USER_ID}\",\"delivery_method\":\"DELIVERY_METHOD_PICKUP\",\"pickup_point_id\":\"660e8400-e29b-41d4-a716-446655440001\"}" | jq -r .order.id)
-
-curl -X POST "http://localhost:8080/v1/orders/${ORDER_ID}/status" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H 'Content-Type: application/json' \
-  -d '{"fromStatus":"ORDER_STATUS_CREATED","toStatus":"ORDER_STATUS_PAID"}'
+pip install pytest requests Faker
 ```
 
-> grpc-gateway JSON uses camelCase (`accessToken`, `userId`, `fromStatus`, …).
-
-## gRPC
-
-- `store.user.v1.UserService`
-- `store.catalog.v1.CatalogService`
-- `store.cart.v1.CartService`
-- `store.order.v1.OrderService`
-- `store.promo.v1.PromoService`
-
-Connect to `localhost:50051`. Contracts live in `proto/`.
-
-## Code generation
+Run the complete test suite:
 
 ```bash
-make generate
+python -m pytest
 ```
 
-Docker image builds run `make generate` in the builder stage (protoc + plugins installed there), so a clean clone does not need a local `gen/` directory.
+Run tests with verbose output:
 
-## Ports
+```bash
+python -m pytest -v
+```
 
-| Port  | Protocol              |
-|-------|-----------------------|
-| 50051 | gRPC                  |
-| 8081  | HTTP JSON + Web UI (Docker host → container `:8080`) |
-| 8080  | HTTP JSON + Web UI (local `go run` / inside container) |
-| 5432  | PostgreSQL            |
+## Configuration
+
+The API base URL can be configured using the `BASE_URL` environment variable.
+
+By default, the tests use:
+
+```text
+http://localhost:8080
+```
+
+Example:
+
+```bash
+BASE_URL=http://localhost:8080 python -m pytest
+```
+
+## About the Project
+
+This repository contains the test automation part of a training e-commerce project.
+
+The backend application is maintained separately and is used as the system under test. The automated test suite is developed independently from the application source code.
