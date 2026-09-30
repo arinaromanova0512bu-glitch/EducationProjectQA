@@ -1,11 +1,8 @@
-import requests
 import pytest
 
-from api_client import BASE_URL
 
-
-def test_user_registration_success(user_data):
-    response = requests.post(f"{BASE_URL}/v1/users/register", json=user_data)
+def test_user_registration_success(user_data, auth_client):
+    response = auth_client.register_user(user_data)
     response_data = response.json()
 
     assert response.status_code == 200
@@ -16,14 +13,14 @@ def test_user_registration_success(user_data):
     assert response_data["accessToken"]
 
 
-def test_user_login_success(registered_user):
+def test_user_login_success(registered_user, auth_client):
     login_data = {
-        "email":registered_user["email"],
-        "password":registered_user["password"]
+        "email": registered_user["email"],
+        "password": registered_user["password"]
     }
 
-    response=requests.post(f"{BASE_URL}/v1/users/login", json=login_data)
-    response_data=response.json()
+    response = auth_client.login_user(login_data)
+    response_data = response.json()
 
     assert response.status_code == 200
     assert response_data["user"]["email"] == registered_user["email"]
@@ -38,15 +35,15 @@ def test_user_login_success(registered_user):
     ]
 )
 def test_user_login_with_invalid_credentials(
-        registered_user, field, invalid_value
+    registered_user, field, invalid_value, auth_client
 ):
     login_data = {
-        "email":registered_user["email"],
-        "password":registered_user["password"]
+        "email": registered_user["email"],
+        "password": registered_user["password"]
     }
     login_data[field] = invalid_value
 
-    response = requests.post(f"{BASE_URL}/v1/users/login", json=login_data)
+    response = auth_client.login_user(login_data)
     response_data = response.json()
 
     assert response.status_code == 401
@@ -58,13 +55,13 @@ def test_user_login_with_invalid_credentials(
     "field, action",
     [
         ("email", "empty"),
-        ("email","remove"),
+        ("email", "remove"),
         ("password", "empty"),
         ("password", "remove")
     ]
 )
 def test_user_login_with_missing_or_empty_required_field(
-        registered_user, field, action
+    registered_user, field, action, auth_client
 ):
     login_data = {
         "email": registered_user["email"],
@@ -76,7 +73,7 @@ def test_user_login_with_missing_or_empty_required_field(
     elif action == "remove":
         login_data.pop(field)
 
-    response = requests.post(f"{BASE_URL}/v1/users/login", json=login_data)
+    response = auth_client.login_user(login_data)
     response_data = response.json()
 
     assert response.status_code == 400
@@ -86,16 +83,16 @@ def test_user_login_with_missing_or_empty_required_field(
 
 @pytest.mark.parametrize(
     "field",
-    ["email","password"]
+    ["email", "password"]
 )
-def test_user_login_with_invalid_field_type(registered_user, field):
+def test_user_login_with_invalid_field_type(registered_user, field, auth_client):
     login_data = {
         "email": registered_user["email"],
         "password": registered_user["password"]
     }
     login_data[field] = 123
 
-    response = requests.post(f"{BASE_URL}/v1/users/login", json=login_data)
+    response = auth_client.login_user(login_data)
     response_data = response.json()
 
     assert response.status_code == 400
@@ -113,14 +110,14 @@ def test_user_login_with_invalid_field_type(registered_user, field):
     ]
 )
 def test_user_registration_with_missing_or_empty_required_field(
-        user_data, field, action
+    user_data, field, action, auth_client
 ):
     if action == "empty":
         user_data[field] = ""
     elif action == "remove":
         user_data.pop(field)
 
-    response = requests.post(f"{BASE_URL}/v1/users/register", json=user_data)
+    response = auth_client.register_user(user_data)
     response_data = response.json()
 
     assert response.status_code == 400
@@ -130,24 +127,27 @@ def test_user_registration_with_missing_or_empty_required_field(
 
 @pytest.mark.parametrize(
     "field",
-    ["email", "password", "name"])
-def test_user_registration_with_invalid_field_type(user_data, field):
+    ["email", "password", "name"]
+)
+def test_user_registration_with_invalid_field_type(
+    user_data, field, auth_client
+):
     user_data[field] = 123
 
-    response = requests.post(f"{BASE_URL}/v1/users/register", json=user_data)
+    response = auth_client.register_user(user_data)
     response_data = response.json()
 
     assert response.status_code == 400
     assert response_data["code"] == 3
     assert f"invalid value for string field {field}" in response_data["message"]
 
-def test_user_registration_with_whitespace_only_email(user_data):
+
+def test_user_registration_with_whitespace_only_email(user_data, auth_client):
     user_data["email"] = "    "
 
-    response = requests.post(f"{BASE_URL}/v1/users/register", json=user_data)
+    response = auth_client.register_user(user_data)
     response_data = response.json()
 
     assert response.status_code == 400
     assert response_data["code"] == 3
     assert response_data["message"] == "email и password обязательны"
-

@@ -1,11 +1,5 @@
-import requests
-
-
-from api_client import BASE_URL
-
-
-def test_get_products_list():
-    response = requests.get(f"{BASE_URL}/v1/products")
+def test_get_products_list(catalog_client):
+    response = catalog_client.get_products()
 
     assert response.status_code == 200
 
@@ -16,8 +10,8 @@ def test_get_products_list():
     assert isinstance(response_data["products"], list)
 
 
-def test_product_structure_in_products_list():
-    response = requests.get(f"{BASE_URL}/v1/products")
+def test_product_structure_in_products_list(catalog_client):
+    response = catalog_client.get_products()
 
     assert response.status_code == 200
 
@@ -32,10 +26,10 @@ def test_product_structure_in_products_list():
     assert "brand" in product
 
 
-def test_get_existing_product(products):
+def test_get_existing_product(products, catalog_client):
     product_id = products[0]["id"]
 
-    response = requests.get(f"{BASE_URL}/v1/products/{product_id}")
+    response = catalog_client.get_product(product_id)
 
     assert response.status_code == 200
 
@@ -44,26 +38,28 @@ def test_get_existing_product(products):
     assert product_id == product_response_data["product"]["id"]
 
 
-def test_get_nonexistent_product():
+def test_get_nonexistent_product(catalog_client):
     product_id = "00000000-0000-0000-0000-000000000000"
 
-    response = requests.get(f"{BASE_URL}/v1/products/{product_id}")
+    response = catalog_client.get_product(product_id)
+
+    assert response.status_code == 404
 
     response_data = response.json()
 
-    assert response.status_code == 404
     assert response_data["code"] == 5
     assert response_data["message"] == f"Товар с ID '{product_id}' не найден"
 
 
-def test_get_product_with_empty_product_id():
+def test_get_product_with_empty_product_id(catalog_client):
     product_id = ""
 
-    response = requests.get(f"{BASE_URL}/v1/products/{product_id}")
+    response = catalog_client.get_product(product_id)
+
+    assert response.status_code == 400
 
     response_data = response.json()
 
-    assert response.status_code == 400
     assert response_data["code"] == 3
     assert response_data["message"] == "ID товара не может быть пустым"
 
