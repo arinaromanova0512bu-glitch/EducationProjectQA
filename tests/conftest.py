@@ -5,6 +5,7 @@ from api_clients.auth_client import AuthClient
 from api_clients.users_client import UsersClient
 from api_clients.catalog_client import CatalogClient
 from api_clients.cart_client import CartClient
+from api_clients.order_client import OrderClient
 
 fake = Faker()
 
@@ -27,6 +28,11 @@ def catalog_client():
 @pytest.fixture
 def cart_client():
     return CartClient()
+
+
+@pytest.fixture
+def order_client():
+    return OrderClient()
 
 
 @pytest.fixture
@@ -71,8 +77,6 @@ def products(catalog_client):
 
 @pytest.fixture
 def second_registered_user(auth_client):
-    fake = Faker()
-
     data = {
         "email": fake.email(),
         "password": fake.password(),
@@ -93,3 +97,45 @@ def second_registered_user(auth_client):
         "access_token": response_data["accessToken"]
     }
 
+
+@pytest.fixture
+def created_order(
+        registered_user,
+        products,
+        cart_client,
+        order_client
+):
+    user_id = registered_user["id"]
+    access_token = registered_user["access_token"]
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    product = products[0]
+    product_id = product["id"]
+    quantity = 2
+
+    response = cart_client.add_to_cart(
+        user_id,
+        product_id,
+        quantity,
+        headers=headers
+    )
+
+    assert response.status_code == 200
+
+    response = order_client.create_order(
+        user_id,
+        headers=headers
+    )
+
+    assert response.status_code == 200
+
+    order = response.json()["order"]
+
+    return {
+        "order": order,
+        "order_id": order["id"],
+        "user_id": user_id,
+        "headers": headers
+    }
