@@ -1,887 +1,1177 @@
 import logging
 
+import allure
 from playwright.sync_api import expect
 
 logger = logging.getLogger(__name__)
 
 
-def test_select_courier_delivery(checkout_with_product):
-    checkout_page = checkout_with_product
+@allure.epic("Интернет-магазин")
+@allure.feature("Оформление заказа")
+@allure.story("Выбор способа доставки")
+class TestDeliveryMethods:
 
-    logger.info("Начинаем тест выбора курьерской доставки")
-    logger.info("Выбрать способ доставки «Курьер»")
+    @allure.title("Выбор курьерской доставки")
+    def test_select_courier_delivery(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    checkout_page.select_courier_delivery()
+        logger.info("Начинаем тест выбора курьерской доставки")
+        logger.info("Выбрать способ доставки «Курьер»")
 
-    logger.info("Проверить, что курьерская доставка выбрана")
-    expect(checkout_page.courier_button).to_have_attribute(
-        "data-active", "true"
-    )
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
-    logger.info("Проверить отображение сохранённых адресов")
-    expect(checkout_page.address_options.first).to_be_visible()
+        logger.info("Проверить, что курьерская доставка выбрана")
 
+        with allure.step("Проверить активность курьерской доставки"):
+            expect(checkout_page.courier_button).to_have_attribute(
+                "data-active", "true"
+            )
 
-def test_select_pickup_delivery(checkout_with_product):
-    checkout_page = checkout_with_product
+        logger.info("Проверить отображение сохранённых адресов")
 
-    logger.info("Начинаем тест выбора самовывоза")
-    logger.info("Выбрать способ доставки «Самовывоз»")
+        with allure.step("Проверить отображение сохранённых адресов"):
+            expect(checkout_page.address_options.first).to_be_visible()
 
-    checkout_page.select_pickup_delivery()
+    @allure.title("Выбор самовывоза")
+    def test_select_pickup_delivery(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    expect(
-        checkout_page.pickup_button
-    ).to_have_attribute("data-active", "true")
-    expect(
-        checkout_page.courier_button
-    ).to_have_attribute("data-active", "false")
-    expect(checkout_page.pickup_options.first).to_be_visible()
-    expect(checkout_page.delivery_fee).to_have_attribute("data-cents", "0")
+        logger.info("Начинаем тест выбора самовывоза")
+        logger.info("Выбрать способ доставки «Самовывоз»")
 
+        with allure.step("Выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
-def test_select_pickup_point(checkout_with_product):
-    checkout_page = checkout_with_product
+        with allure.step("Проверить активность самовывоза"):
+            expect(
+                checkout_page.pickup_button
+            ).to_have_attribute("data-active", "true")
 
-    logger.info("Начинаем тест выбора опций самовывоза")
-    logger.info("Выбрать способ доставки «Самовывоз»")
+        with allure.step("Проверить неактивность курьерской доставки"):
+            expect(
+                checkout_page.courier_button
+            ).to_have_attribute("data-active", "false")
 
-    checkout_page.select_pickup_delivery()
+        with allure.step("Проверить отображение пунктов самовывоза"):
+            expect(checkout_page.pickup_options.first).to_be_visible()
 
-    expect(checkout_page.pickup_options.first).to_be_visible()
-    expect(checkout_page.pickup_options).to_have_count(5)
+        with allure.step("Проверить бесплатную доставку"):
+            expect(checkout_page.delivery_fee).to_have_attribute(
+                "data-cents", "0"
+            )
 
-    logger.info("Выбор пункта выдачи")
+    @allure.title("Выбор пункта самовывоза")
+    def test_select_pickup_point(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    checkout_page.select_pickup_point(index=1)
+        logger.info("Начинаем тест выбора опций самовывоза")
+        logger.info("Выбрать способ доставки «Самовывоз»")
 
-    expect(
-        checkout_page.pickup_options.nth(1)
-    ).to_have_attribute("data-active", "true")
-    expect(
-        checkout_page.pickup_options.nth(0)
-    ).to_have_attribute("data-active", "false")
+        with allure.step("Выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
+        with allure.step("Проверить отображение пяти пунктов выдачи"):
+            expect(checkout_page.pickup_options.first).to_be_visible()
+            expect(checkout_page.pickup_options).to_have_count(5)
 
-def test_switch_delivery_methods(checkout_with_product):
-    checkout_page = checkout_with_product
+        logger.info("Выбор пункта выдачи")
 
-    logger.info("Начинаем тест выбора опций получения заказа")
-    logger.info("Выбрать способ доставки «Самовывоз»")
+        with allure.step("Выбрать второй пункт выдачи"):
+            checkout_page.select_pickup_point(index=1)
 
-    checkout_page.select_pickup_delivery()
+        with allure.step("Проверить активность выбранного пункта"):
+            expect(
+                checkout_page.pickup_options.nth(1)
+            ).to_have_attribute("data-active", "true")
 
-    expect(checkout_page.pickup_options.first).to_be_visible()
-    expect(checkout_page.pickup_button).to_have_attribute("data-active", "true")
+        with allure.step("Проверить неактивность первого пункта"):
+            expect(
+                checkout_page.pickup_options.nth(0)
+            ).to_have_attribute("data-active", "false")
 
-    logger.info("Выбрать способ доставки «Курьер»")
+    @allure.title("Переключение способов доставки")
+    def test_switch_delivery_methods(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    checkout_page.select_courier_delivery()
+        logger.info("Начинаем тест выбора опций получения заказа")
+        logger.info("Выбрать способ доставки «Самовывоз»")
 
-    expect(checkout_page.courier_button).to_have_attribute("data-active", "true")
-    expect(checkout_page.address_options.first).to_be_visible()
-    expect(checkout_page.pickup_button).to_have_attribute("data-active", "false")
+        with allure.step("Выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
-    logger.info("Снова выбрать способ доставки «Самовывоз»")
+        with allure.step("Проверить выбранный способ доставки"):
+            expect(checkout_page.pickup_options.first).to_be_visible()
+            expect(checkout_page.pickup_button).to_have_attribute(
+                "data-active", "true"
+            )
 
-    checkout_page.select_pickup_delivery()
+        logger.info("Выбрать способ доставки «Курьер»")
 
-    expect(checkout_page.pickup_button).to_have_attribute("data-active", "true")
-    expect(checkout_page.courier_button).to_have_attribute("data-active", "false")
-    expect(checkout_page.pickup_options.first).to_be_visible()
+        with allure.step("Переключиться на курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
+        with allure.step("Проверить переключение на курьера"):
+            expect(checkout_page.courier_button).to_have_attribute(
+                "data-active", "true"
+            )
+            expect(checkout_page.address_options.first).to_be_visible()
+            expect(checkout_page.pickup_button).to_have_attribute(
+                "data-active", "false"
+            )
 
-def test_toggle_delivery_address_form(checkout_with_product):
-    checkout_page = checkout_with_product
+        logger.info("Снова выбрать способ доставки «Самовывоз»")
 
-    logger.info("Начинаем тест открытия и закрытия формы адреса доставки")
-    logger.info("Выбрать способ доставки «Курьер»")
+        with allure.step("Повторно выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
-    checkout_page.select_courier_delivery()
+        with allure.step("Проверить повторное переключение"):
+            expect(checkout_page.pickup_button).to_have_attribute(
+                "data-active", "true"
+            )
+            expect(checkout_page.courier_button).to_have_attribute(
+                "data-active", "false"
+            )
+            expect(checkout_page.pickup_options.first).to_be_visible()
 
-    if not checkout_page.address_form.is_visible():
-        checkout_page.toggle_address_form()
+@allure.epic("Интернет-магазин")
+@allure.feature("Оформление заказа")
+@allure.story("Управление адресами доставки")
+class TestDeliveryAddress:
 
-    expect(checkout_page.address_form).to_be_visible()
+    @allure.title("Открытие и закрытие формы адреса доставки")
+    def test_toggle_delivery_address_form(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    logger.info("Нажать кнопку сворачивания формы адреса")
+        logger.info("Начинаем тест открытия и закрытия формы адреса доставки")
+        logger.info("Выбрать способ доставки «Курьер»")
 
-    checkout_page.toggle_address_form()
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
-    expect(checkout_page.address_form).to_be_hidden()
+        with allure.step("Открыть форму адреса, если она закрыта"):
+            if not checkout_page.address_form.is_visible():
+                checkout_page.toggle_address_form()
 
-    logger.info("Повторно открыть форму адреса")
+        with allure.step("Проверить отображение формы адреса"):
+            expect(checkout_page.address_form).to_be_visible()
+
+        logger.info("Нажать кнопку сворачивания формы адреса")
 
-    checkout_page.toggle_address_form()
+        with allure.step("Закрыть форму адреса доставки"):
+            checkout_page.toggle_address_form()
 
-    expect(checkout_page.address_form).to_be_visible()
+        with allure.step("Проверить, что форма скрыта"):
+            expect(checkout_page.address_form).to_be_hidden()
 
+        logger.info("Повторно открыть форму адреса")
 
-def test_save_delivery_address(checkout_with_product):
-    checkout_page = checkout_with_product
+        with allure.step("Повторно открыть форму адреса"):
+            checkout_page.toggle_address_form()
 
-    logger.info("Начинаем тест успешного сохранения адреса доставки")
-    logger.info("Выбрать способ доставки «Курьер»")
+        with allure.step("Проверить повторное отображение формы"):
+            expect(checkout_page.address_form).to_be_visible()
 
-    checkout_page.select_courier_delivery()
+    @allure.title("Успешное сохранение адреса доставки")
+    def test_save_delivery_address(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    if not checkout_page.address_form.is_visible():
-        checkout_page.toggle_address_form()
+        logger.info("Начинаем тест успешного сохранения адреса доставки")
+        logger.info("Выбрать способ доставки «Курьер»")
 
-    expect(checkout_page.address_form).to_be_visible()
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
-    logger.info("Заполнить поля формы")
+        with allure.step("Открыть форму адреса, если она закрыта"):
+            if not checkout_page.address_form.is_visible():
+                checkout_page.toggle_address_form()
 
-    checkout_page.fill_delivery_address(
-        city="Москва",
-        street="Ленина",
-        building="10",
-        apartment="25",
-        recipient="Анна Иванова",
-        phone="+79999124567"
-    )
+        with allure.step("Проверить отображение формы адреса"):
+            expect(checkout_page.address_form).to_be_visible()
 
-    addresses_before = checkout_page.address_options.count()
+        logger.info("Заполнить поля формы")
 
-    logger.info("Нажать кнопку «Сохранить адрес»")
+        with allure.step("Заполнить данные адреса доставки"):
+            checkout_page.fill_delivery_address(
+                city="Москва",
+                street="Ленина",
+                building="10",
+                apartment="25",
+                recipient="Анна Иванова",
+                phone="+79999124567"
+            )
 
-    checkout_page.save_delivery_address()
+        with allure.step("Получить количество сохранённых адресов"):
+            addresses_before = checkout_page.address_options.count()
 
-    expect(checkout_page.address_options).to_have_count(addresses_before + 1)
-    expect(checkout_page.address_options.last).to_be_visible()
-    expect(checkout_page.address_options.last).to_contain_text("Москва, Ленина, 10")
-    expect(checkout_page.address_options.last).to_have_attribute("data-active", "true")
+        logger.info("Нажать кнопку «Сохранить адрес»")
 
+        with allure.step("Сохранить новый адрес"):
+            checkout_page.save_delivery_address()
 
-def test_save_delivery_address_with_whitespace_fields(checkout_with_product):
-    checkout_page = checkout_with_product
+        with allure.step("Проверить увеличение количества адресов"):
+            expect(checkout_page.address_options).to_have_count(
+                addresses_before + 1
+            )
 
-    logger.info("Проверка сохранения адреса с пробелами в обязательных полях")
-    logger.info("Выбрать способ доставки «Курьер»")
+        with allure.step("Проверить отображение нового адреса"):
+            expect(checkout_page.address_options.last).to_be_visible()
+            expect(checkout_page.address_options.last).to_contain_text(
+                "Москва, Ленина, 10"
+            )
 
-    checkout_page.select_courier_delivery()
+        with allure.step("Проверить, что новый адрес выбран"):
+            expect(checkout_page.address_options.last).to_have_attribute(
+                "data-active", "true"
+            )
 
-    if not checkout_page.address_form.is_visible():
-        checkout_page.toggle_address_form()
+    @allure.title("Адрес с пробелами в обязательных полях не сохраняется")
+    def test_save_delivery_address_with_whitespace_fields(
+        self, checkout_with_product
+    ):
+        checkout_page = checkout_with_product
 
-    expect(checkout_page.address_form).to_be_visible()
+        logger.info("Проверка сохранения адреса с пробелами в обязательных полях")
+        logger.info("Выбрать способ доставки «Курьер»")
 
-    logger.info("Заполнить обязательные поля только пробелами")
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
-    checkout_page.fill_delivery_address(
-        city="   ",
-        street="   ",
-        building="   ",
-        apartment="   ",
-        recipient="   ",
-        phone="   "
-    )
+        with allure.step("Открыть форму адреса, если она закрыта"):
+            if not checkout_page.address_form.is_visible():
+                checkout_page.toggle_address_form()
 
-    logger.info("Нажать кнопку «Сохранить адрес»")
+        with allure.step("Проверить отображение формы"):
+            expect(checkout_page.address_form).to_be_visible()
 
-    addresses_before = checkout_page.address_options.count()
+        logger.info("Заполнить обязательные поля только пробелами")
 
-    expect(checkout_page.save_address_button).to_be_enabled()
+        with allure.step("Заполнить поля адреса пробелами"):
+            checkout_page.fill_delivery_address(
+                city="   ",
+                street="   ",
+                building="   ",
+                apartment="   ",
+                recipient="   ",
+                phone="   "
+            )
 
-    checkout_page.save_delivery_address()
+        logger.info("Нажать кнопку «Сохранить адрес»")
 
-    expect(checkout_page.toast).to_be_visible()
-    expect(checkout_page.toast).to_have_attribute("data-toast-type", "error")
-    expect(checkout_page.toast).to_have_text("city обязателен")
+        with allure.step("Получить количество адресов до сохранения"):
+            addresses_before = checkout_page.address_options.count()
 
-    expect(checkout_page.address_options).to_have_count(addresses_before)
-    expect(checkout_page.address_form).to_be_visible()
+        with allure.step("Проверить доступность кнопки сохранения"):
+            expect(checkout_page.save_address_button).to_be_enabled()
 
+        with allure.step("Попробовать сохранить адрес"):
+            checkout_page.save_delivery_address()
 
-def test_cannot_proceed_to_payment_without_delivery_address(checkout_new_user):
-    checkout_page = checkout_new_user
+        with allure.step("Проверить отображение ошибки"):
+            expect(checkout_page.toast).to_be_visible()
+            expect(checkout_page.toast).to_have_attribute(
+                "data-toast-type", "error"
+            )
+            expect(checkout_page.toast).to_have_text("city обязателен")
 
-    logger.info("Проверка невозможности перехода к оплате без адреса доставки")
+        with allure.step("Проверить, что новый адрес не сохранился"):
+            expect(checkout_page.address_options).to_have_count(
+                addresses_before
+            )
 
-    checkout_page.select_courier_delivery()
+        with allure.step("Проверить, что форма адреса осталась открытой"):
+            expect(checkout_page.address_form).to_be_visible()
 
-    logger.info("Проверяем отсутствие сохранённых адресов")
-    expect(checkout_page.address_options).to_have_count(0)
+    @allure.title("Нельзя перейти к оплате без адреса доставки")
+    def test_cannot_proceed_to_payment_without_delivery_address(
+        self, checkout_new_user
+    ):
+        checkout_page = checkout_new_user
 
-    logger.info("Проверяем, что кнопка «К оплате» неактивна")
-    expect(checkout_page.pay_button).to_be_disabled()
+        logger.info(
+            "Проверка невозможности перехода к оплате без адреса доставки"
+        )
+
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
+        logger.info("Проверяем отсутствие сохранённых адресов")
 
-def test_delivery_fee_changes_when_switching_methods(checkout_with_product):
-    checkout_page = checkout_with_product
+        with allure.step("Проверить отсутствие сохранённых адресов"):
+            expect(checkout_page.address_options).to_have_count(0)
+
+        logger.info("Проверяем, что кнопка «К оплате» неактивна")
 
-    logger.info("Проверка пересчёта стоимости доставки при переключении способов получения")
-    logger.info("Выбрать способ доставки «Курьер»")
+        with allure.step("Проверить недоступность кнопки «К оплате»"):
+            expect(checkout_page.pay_button).to_be_disabled()
 
-    checkout_page.select_courier_delivery()
+@allure.epic("Интернет-магазин")
+@allure.feature("Оформление заказа")
+@allure.story("Расчёт стоимости заказа и доставки")
+class TestCheckoutTotal:
 
-    expect(checkout_page.delivery_fee).to_have_attribute("data-cents", "29900")
+    @allure.title("Пересчёт стоимости доставки при смене способа получения")
+    def test_delivery_fee_changes_when_switching_methods(
+        self, checkout_with_product
+    ):
+        checkout_page = checkout_with_product
 
-    logger.info("Переключиться на самовывоз")
+        logger.info(
+            "Проверка пересчёта стоимости доставки "
+            "при переключении способов получения"
+        )
+        logger.info("Выбрать способ доставки «Курьер»")
 
-    checkout_page.select_pickup_delivery()
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
-    expect(checkout_page.delivery_fee).to_have_attribute("data-cents", "0")
+        with allure.step("Проверить стоимость курьерской доставки"):
+            expect(checkout_page.delivery_fee).to_have_attribute(
+                "data-cents", "29900"
+            )
 
-    logger.info("Повторно выбрать способ доставки «Курьер»")
+        logger.info("Переключиться на самовывоз")
 
-    checkout_page.select_courier_delivery()
+        with allure.step("Выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
-    expect(checkout_page.delivery_fee).to_have_attribute("data-cents", "29900")
+        with allure.step("Проверить, что самовывоз бесплатный"):
+            expect(checkout_page.delivery_fee).to_have_attribute(
+                "data-cents", "0"
+            )
 
+        logger.info("Повторно выбрать способ доставки «Курьер»")
 
-def test_checkout_total_with_courier_delivery(checkout_with_product):
-    checkout_page = checkout_with_product
+        with allure.step("Повторно выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
-    logger.info("Проверка расчёта итоговой стоимости заказа при курьерской доставке")
+        with allure.step("Проверить восстановление стоимости доставки"):
+            expect(checkout_page.delivery_fee).to_have_attribute(
+                "data-cents", "29900"
+            )
 
-    checkout_page.select_courier_delivery()
+    @allure.title("Расчёт итоговой стоимости при курьерской доставке")
+    def test_checkout_total_with_courier_delivery(
+        self, checkout_with_product
+    ):
+        checkout_page = checkout_with_product
+
+        logger.info(
+            "Проверка расчёта итоговой стоимости заказа "
+            "при курьерской доставке"
+        )
+
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
+
+        logger.info("Получить стоимость товаров")
 
-    logger.info("Получить стоимость товаров")
+        with allure.step("Получить стоимость товаров в копейках"):
+            subtotal = checkout_page.subtotal.inner_text()
+            subtotal = int(float(
+                subtotal.replace("\xa0", "")
+                .replace(" ", "")
+                .replace("$", "")
+                .replace(",", ".")
+            ) * 100)
 
-    subtotal = checkout_page.subtotal.inner_text()
-    subtotal = int(float(
-        subtotal.replace("\xa0", "")
-        .replace(" ", "")
-        .replace("$", "")
-        .replace(",", ".")
-    ) * 100)
+        logger.info("Получить стоимость доставки")
+
+        with allure.step("Получить стоимость доставки"):
+            delivery_fee = int(
+                checkout_page.delivery_fee.get_attribute("data-cents")
+            )
+
+        logger.info("Получить итоговую стоимость")
+
+        with allure.step("Получить итоговую стоимость заказа"):
+            total = checkout_page.total.inner_text()
+            total = int(float(
+                total.replace("\xa0", "")
+                .replace(" ", "")
+                .replace("$", "")
+                .replace(",", ".")
+            ) * 100)
 
-    logger.info("Получить стоимость доставки")
+        logger.info("Проверить информацию о скидках на странице")
 
-    delivery_fee = int(checkout_page.delivery_fee.get_attribute("data-cents"))
+        with allure.step("Получить информацию со страницы заказа"):
+            logger.info(
+                checkout_page.page.locator("body").inner_text()
+            )
 
-    logger.info("Получить итоговую стоимость")
+        logger.info("Вычислить ожидаемую итоговую стоимость")
 
-    total = checkout_page.total.inner_text()
-    total = int(float(
-        total.replace("\xa0", "")
-        .replace(" ", "")
-        .replace("$", "")
-        .replace(",", ".")
-    ) * 100)
-    logger.info("Проверить информацию о скидках на странице")
+        with allure.step("Рассчитать ожидаемую итоговую стоимость"):
+            expected_total = subtotal + delivery_fee
 
-    logger.info(
-        checkout_page.page.locator("body").inner_text()
-    )
-    logger.info("Вычислить ожидаемую итоговую стоимость")
+        logger.info("Сравнить ожидаемую и фактическую стоимость")
 
-    expected_total = subtotal + delivery_fee
+        with allure.step("Проверить правильность итоговой стоимости"):
+            assert total == expected_total, (
+                f"Неверная итоговая стоимость: "
+                f"ожидалось {expected_total}, получено {total}"
+            )
 
-    logger.info("Сравнить ожидаемую и фактическую стоимость")
+    @allure.title("Расчёт итоговой стоимости при самовывозе")
+    def test_checkout_total_with_pickup_delivery(
+        self, checkout_with_product
+    ):
+        checkout_page = checkout_with_product
 
-    assert total == expected_total, (
-        f"Неверная итоговая стоимость: "
-        f"ожидалось {expected_total}, получено {total}"
-    )
+        logger.info(
+            "Проверка расчёта итоговой стоимости заказа при самовывозе"
+        )
 
+        with allure.step("Выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
-def test_checkout_total_with_pickup_delivery(checkout_with_product):
-    checkout_page = checkout_with_product
+        logger.info("Получить стоимость товаров")
 
-    logger.info("Проверка расчёта итоговой стоимости заказа при самовывозе")
+        with allure.step("Получить стоимость товаров в копейках"):
+            subtotal = checkout_page.subtotal.inner_text()
+            subtotal = int(float(
+                subtotal.replace("\xa0", "")
+                .replace(" ", "")
+                .replace("$", "")
+                .replace(",", ".")
+            ) * 100)
 
-    checkout_page.select_pickup_delivery()
+        logger.info("Получить стоимость доставки")
 
-    logger.info("Получить стоимость товаров")
+        with allure.step("Получить стоимость доставки"):
+            delivery_fee = int(
+                checkout_page.delivery_fee.get_attribute("data-cents")
+            )
 
-    subtotal = checkout_page.subtotal.inner_text()
-    subtotal = int(float(
-        subtotal.replace("\xa0", "")
-        .replace(" ", "")
-        .replace("$", "")
-        .replace(",", ".")
-    ) * 100)
+        logger.info("Получить итоговую стоимость")
 
-    logger.info("Получить стоимость доставки")
+        with allure.step("Получить итоговую стоимость заказа"):
+            total = checkout_page.total.inner_text()
+            total = int(float(
+                total.replace("\xa0", "")
+                .replace(" ", "")
+                .replace("$", "")
+                .replace(",", ".")
+            ) * 100)
 
-    delivery_fee = int(checkout_page.delivery_fee.get_attribute("data-cents"))
+        logger.info("Проверить, что самовывоз бесплатный")
 
-    logger.info("Получить итоговую стоимость")
+        with allure.step("Проверить нулевую стоимость доставки"):
+            assert delivery_fee == 0, (
+                f"Ожидалась бесплатная доставка, получено {delivery_fee}"
+            )
 
-    total = checkout_page.total.inner_text()
-    total = int(float(
-        total.replace("\xa0", "")
-        .replace(" ", "")
-        .replace("$", "")
-        .replace(",", ".")
-    ) * 100)
+        logger.info("Проверить правильность итоговой стоимости")
 
-    logger.info("Проверить, что самовывоз бесплатный")
+        with allure.step("Рассчитать ожидаемую итоговую стоимость"):
+            expected_total = subtotal + delivery_fee
 
-    assert delivery_fee == 0, (
-        f"Ожидалась бесплатная доставка, получено {delivery_fee}"
-    )
+        with allure.step("Сравнить ожидаемую и фактическую стоимость"):
+            assert total == expected_total, (
+                f"Неверная итоговая стоимость: "
+                f"ожидалось {expected_total}, получено {total}"
+            )
 
-    logger.info("Проверить правильность итоговой стоимости")
+@allure.epic("Интернет-магазин")
+@allure.feature("Оформление заказа")
+@allure.story("Переходы между этапами оформления заказа")
+class TestCheckoutNavigation:
 
-    expected_total = subtotal + delivery_fee
+    @allure.title("Переход к оплате при самовывозе")
+    def test_proceed_to_payment_with_pickup(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    assert total == expected_total, (
-        f"Неверная итоговая стоимость: "
-        f"ожидалось {expected_total}, получено {total}"
-    )
+        logger.info("Начинаем тест выбора опций самовывоза")
+        logger.info("Выбрать способ доставки «Самовывоз»")
 
+        with allure.step("Выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
-def test_proceed_to_payment_with_pickup(checkout_with_product):
-    checkout_page = checkout_with_product
+        with allure.step("Проверить отображение пунктов самовывоза"):
+            expect(checkout_page.pickup_options.first).to_be_visible()
 
-    logger.info("Начинаем тест выбора опций самовывоза")
-    logger.info("Выбрать способ доставки «Самовывоз»")
+        logger.info("Выбор пункта выдачи")
 
-    checkout_page.select_pickup_delivery()
+        with allure.step("Выбрать первый пункт выдачи"):
+            checkout_page.select_pickup_point(index=0)
 
-    expect(checkout_page.pickup_options.first).to_be_visible()
+        with allure.step("Проверить активность выбранного пункта выдачи"):
+            expect(checkout_page.pickup_options.nth(0)).to_have_attribute(
+                "data-active", "true"
+            )
 
-    logger.info("Выбор пункта выдачи")
+        logger.info("Перейти на страницу оплаты")
 
-    checkout_page.select_pickup_point(index=0)
+        with allure.step("Проверить доступность кнопки перехода к оплате"):
+            expect(checkout_page.pay_button).to_be_enabled()
 
-    expect(checkout_page.pickup_options.nth(0)).to_have_attribute("data-active", "true")
+        with allure.step("Перейти на страницу оплаты"):
+            checkout_page.proceed_to_payment()
 
-    logger.info("Перейти на страницу оплаты")
+        with allure.step("Проверить отображение страницы оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-    expect(checkout_page.pay_button).to_be_enabled()
+    @allure.title("Переход к оплате при курьерской доставке")
+    def test_proceed_to_payment_with_courier(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    checkout_page.proceed_to_payment()
+        logger.info("Начинаем тест перехода к оплате при курьерской доставке")
+        logger.info("Выбрать способ доставки «Курьер»")
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
+        with allure.step("Выбрать курьерскую доставку"):
+            checkout_page.select_courier_delivery()
 
+        with allure.step("Проверить активность курьерской доставки"):
+            expect(checkout_page.courier_button).to_have_attribute(
+                "data-active", "true"
+            )
 
-def test_proceed_to_payment_with_courier(checkout_with_product):
-    checkout_page = checkout_with_product
+        logger.info("Выбрать первый сохранённый адрес доставки")
 
-    logger.info("Начинаем тест перехода к оплате при курьерской доставке")
-    logger.info("Выбрать способ доставки «Курьер»")
+        with allure.step("Проверить наличие сохранённого адреса"):
+            expect(checkout_page.address_options.first).to_be_visible()
 
-    checkout_page.select_courier_delivery()
+        with allure.step("Выбрать первый сохранённый адрес"):
+            checkout_page.address_options.first.click()
 
-    expect(checkout_page.courier_button).to_have_attribute("data-active", "true")
+        with allure.step("Проверить активность выбранного адреса"):
+            expect(checkout_page.address_options.first).to_have_attribute(
+                "data-active", "true"
+            )
 
-    logger.info("Выбрать первый сохранённый адрес доставки")
+        logger.info("Перейти на страницу оплаты")
 
-    expect(checkout_page.address_options.first).to_be_visible()
+        with allure.step("Проверить доступность кнопки перехода к оплате"):
+            expect(checkout_page.pay_button).to_be_enabled()
 
-    checkout_page.address_options.first.click()
+        with allure.step("Перейти на страницу оплаты"):
+            checkout_page.proceed_to_payment()
 
-    expect(checkout_page.address_options.first).to_have_attribute("data-active", "true")
+        with allure.step("Проверить отображение страницы оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-    logger.info("Перейти на страницу оплаты")
+    @allure.title("Возврат с оплаты к выбору доставки")
+    def test_return_to_delivery_from_payment(self, checkout_with_product):
+        checkout_page = checkout_with_product
 
-    expect(checkout_page.pay_button).to_be_enabled()
+        logger.info("Начинаем тест возврата с этапа оплаты к выбору доставки")
+        logger.info("Выбрать способ доставки «Самовывоз»")
 
-    checkout_page.proceed_to_payment()
+        with allure.step("Выбрать самовывоз"):
+            checkout_page.select_pickup_delivery()
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
+        with allure.step("Проверить отображение пунктов самовывоза"):
+            expect(checkout_page.pickup_options.first).to_be_visible()
 
+        logger.info("Выбор пункта выдачи")
 
-def test_return_to_delivery_from_payment(checkout_with_product):
-    checkout_page = checkout_with_product
+        with allure.step("Выбрать первый пункт выдачи"):
+            checkout_page.select_pickup_point(index=0)
 
-    logger.info("Начинаем тест возврата с этапа оплаты к выбору доставки")
-    logger.info("Выбрать способ доставки «Самовывоз»")
+        with allure.step("Проверить активность выбранного пункта выдачи"):
+            expect(checkout_page.pickup_options.nth(0)).to_have_attribute(
+                "data-active", "true"
+            )
 
-    checkout_page.select_pickup_delivery()
+        logger.info("Перейти на страницу оплаты")
 
-    expect(checkout_page.pickup_options.first).to_be_visible()
+        with allure.step("Проверить доступность кнопки перехода к оплате"):
+            expect(checkout_page.pay_button).to_be_enabled()
 
-    logger.info("Выбор пункта выдачи")
+        with allure.step("Перейти на страницу оплаты"):
+            checkout_page.proceed_to_payment()
 
-    checkout_page.select_pickup_point(index=0)
+        with allure.step("Проверить отображение страницы оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-    expect(checkout_page.pickup_options.nth(0)).to_have_attribute("data-active", "true")
+        logger.info("Нажать кнопку возврата к выбору доставки")
 
-    logger.info("Перейти на страницу оплаты")
+        with allure.step("Вернуться к выбору доставки"):
+            checkout_page.return_to_delivery()
 
-    expect(checkout_page.pay_button).to_be_enabled()
+        with allure.step("Проверить отображение страницы доставки"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Доставка")
+            ).to_be_visible()
 
-    checkout_page.proceed_to_payment()
+        with allure.step("Проверить сохранение выбранного способа доставки"):
+            expect(checkout_page.pickup_button).to_have_attribute(
+                "data-active", "true"
+            )
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
+        with allure.step("Проверить сохранение выбранного пункта выдачи"):
+            expect(checkout_page.pickup_options.nth(0)).to_have_attribute(
+                "data-active", "true"
+            )
 
-    logger.info("Нажать кнопку возврата к выбору доставки")
+@allure.epic("Интернет-магазин")
+@allure.feature("Оплата заказа")
+@allure.story("Оплата банковской картой и 3D Secure")
+class TestPayment:
 
-    checkout_page.return_to_delivery()
+    @allure.title("Отображение формы оплаты банковской картой")
+    def test_payment_form_displayed(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Доставка")
-    ).to_be_visible()
-    expect(checkout_page.pickup_button).to_have_attribute("data-active", "true")
-    expect(checkout_page.pickup_options.nth(0)).to_have_attribute("data-active", "true")
+        logger.info("Начинаем тест отображения формы оплаты банковской картой")
+        logger.info("Проверить отображение заголовка «Оплата»")
 
+        with allure.step("Проверить заголовок страницы оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-def test_payment_form_displayed(payment_with_product):
-    checkout_page = payment_with_product
+        logger.info("Проверить отображение формы оплаты")
 
-    logger.info("Начинаем тест отображения формы оплаты банковской картой")
-    logger.info("Проверить отображение заголовка «Оплата»")
+        with allure.step("Проверить отображение формы и полей банковской карты"):
+            expect(checkout_page.card_form).to_be_visible()
+            expect(checkout_page.card_pan).to_be_visible()
+            expect(checkout_page.card_expiry).to_be_visible()
+            expect(checkout_page.card_cvc).to_be_visible()
+            expect(checkout_page.card_holder).to_be_visible()
+            expect(checkout_page.submit_payment_button).to_be_visible()
+            expect(checkout_page.card_visual).to_be_visible()
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
+    @allure.title("Ввод корректных данных банковской карты")
+    def test_fill_payment_form_with_valid_card(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Проверить отображение формы оплаты")
+        logger.info("Начинаем тест ввода корректных данных банковской карты")
+        logger.info("Ввести номер банковской карты")
 
-    expect(checkout_page.card_form).to_be_visible()
-    expect(checkout_page.card_pan).to_be_visible()
-    expect(checkout_page.card_expiry).to_be_visible()
-    expect(checkout_page.card_cvc).to_be_visible()
-    expect(checkout_page.card_holder).to_be_visible()
-    expect(checkout_page.submit_payment_button).to_be_visible()
-    expect(checkout_page.card_visual).to_be_visible()
+        with allure.step("Ввести номер банковской карты"):
+            checkout_page.card_pan.fill("4111111111111111")
 
+        logger.info("Ввести срок действия карты")
 
-def test_fill_payment_form_with_valid_card(payment_with_product):
-    checkout_page = payment_with_product
+        with allure.step("Ввести срок действия карты"):
+            checkout_page.card_expiry.fill("12/28")
 
-    logger.info("Начинаем тест ввода корректных данных банковской карты")
+        logger.info("Ввести CVC")
 
-    logger.info("Ввести номер банковской карты")
+        with allure.step("Ввести CVC"):
+            checkout_page.card_cvc.fill("123")
 
-    checkout_page.card_pan.fill("4111111111111111")
+        logger.info("Ввести имя владельца карты")
 
-    logger.info("Ввести срок действия карты")
+        with allure.step("Ввести имя владельца карты"):
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
-    checkout_page.card_expiry.fill("12/28")
+        logger.info("Проверить введённые данные банковской карты")
 
-    logger.info("Ввести CVC")
+        with allure.step("Проверить введённые данные"):
+            expect(checkout_page.card_pan).to_have_value(
+                "4111 1111 1111 1111"
+            )
+            expect(checkout_page.card_expiry).to_have_value("12/28")
+            expect(checkout_page.card_cvc).to_have_value("123")
+            expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
 
-    checkout_page.card_cvc.fill("123")
+        logger.info("Проверить, что форма оплаты отображается")
 
-    logger.info("Ввести имя владельца карты")
+        with allure.step("Проверить отображение формы оплаты"):
+            expect(checkout_page.card_form).to_be_visible()
 
-    checkout_page.card_holder.fill("IVAN IVANOV")
+        logger.info("Проверить, что кнопка оплаты отображается")
 
-    logger.info("Проверить введённые данные банковской карты")
+        with allure.step("Проверить отображение кнопки оплаты"):
+            expect(checkout_page.submit_payment_button).to_be_visible()
 
-    expect(checkout_page.card_pan).to_have_value("4111 1111 1111 1111")
-    expect(checkout_page.card_expiry).to_have_value("12/28")
-    expect(checkout_page.card_cvc).to_have_value("123")
-    expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
+    @allure.title("Оплата с пустыми полями банковской карты")
+    def test_payment_with_empty_card_fields(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Проверить, что форма оплаты отображается")
+        logger.info("Начинаем тест оплаты с пустыми полями банковской карты")
+        logger.info("Проверить, что форма оплаты отображается")
 
-    expect(checkout_page.card_form).to_be_visible()
+        with allure.step("Проверить отображение формы оплаты"):
+            expect(checkout_page.card_form).to_be_visible()
 
-    logger.info("Проверить, что кнопка оплаты отображается")
+        logger.info("Очистить все поля банковской карты")
 
-    expect(checkout_page.submit_payment_button).to_be_visible()
+        with allure.step("Очистить поля банковской карты"):
+            checkout_page.card_pan.fill("")
+            checkout_page.card_expiry.fill("")
+            checkout_page.card_cvc.fill("")
+            checkout_page.card_holder.fill("")
 
+        logger.info("Проверить, что все поля банковской карты пустые")
 
-def test_payment_with_empty_card_fields(payment_with_product):
-    checkout_page = payment_with_product
+        with allure.step("Проверить пустые поля"):
+            expect(checkout_page.card_pan).to_be_empty()
+            expect(checkout_page.card_expiry).to_be_empty()
+            expect(checkout_page.card_cvc).to_be_empty()
+            expect(checkout_page.card_holder).to_be_empty()
 
-    logger.info("Начинаем тест оплаты с пустыми полями банковской карты")
+        logger.info("Проверить, что кнопка оплаты отображается")
 
-    logger.info("Проверить, что форма оплаты отображается")
+        with allure.step("Проверить отображение кнопки оплаты"):
+            expect(checkout_page.submit_payment_button).to_be_visible()
 
-    expect(checkout_page.card_form).to_be_visible()
+        logger.info("Нажать кнопку «Оплатить» с пустыми полями")
 
-    logger.info("Очистить все поля банковской карты")
+        with allure.step("Попытаться оплатить заказ с пустыми полями"):
+            checkout_page.submit_payment_button.click()
 
-    checkout_page.card_pan.fill("")
-    checkout_page.card_expiry.fill("")
-    checkout_page.card_cvc.fill("")
-    checkout_page.card_holder.fill("")
+        logger.info("Проверить, что пользователь остался на этапе оплаты")
 
-    logger.info("Проверить, что все поля банковской карты пустые")
+        with allure.step("Проверить, что пользователь остался на этапе оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-    expect(checkout_page.card_pan).to_be_empty()
-    expect(checkout_page.card_expiry).to_be_empty()
-    expect(checkout_page.card_cvc).to_be_empty()
-    expect(checkout_page.card_holder).to_be_empty()
+        logger.info("Проверить, что форма оплаты осталась доступна")
 
-    logger.info("Проверить, что кнопка оплаты отображается")
+        with allure.step("Проверить доступность формы оплаты"):
+            expect(checkout_page.card_form).to_be_visible()
 
-    expect(checkout_page.submit_payment_button).to_be_visible()
+    @allure.title("Оплата с некорректным номером банковской карты")
+    def test_payment_with_invalid_card_number(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Нажать кнопку «Оплатить» с пустыми полями")
+        logger.info("Начинаем тест оплаты с некорректным номером банковской карты")
+        logger.info("Ввести некорректный номер банковской карты")
 
-    checkout_page.submit_payment_button.click()
+        with allure.step("Ввести некорректный номер карты"):
+            checkout_page.card_pan.fill("1234567890123456")
 
-    logger.info("Проверить, что пользователь остался на этапе оплаты")
+        logger.info("Заполнить остальные поля корректными данными")
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
+        with allure.step("Заполнить остальные поля карты"):
+            checkout_page.card_expiry.fill("12/28")
+            checkout_page.card_cvc.fill("123")
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
-    logger.info("Проверить, что форма оплаты осталась доступна")
+        logger.info("Проверить, что данные введены")
 
-    expect(checkout_page.card_form).to_be_visible()
+        with allure.step("Проверить введённые данные"):
+            expect(checkout_page.card_pan).to_have_value(
+                "1234 5678 9012 3456"
+            )
+            expect(checkout_page.card_expiry).to_have_value("12/28")
+            expect(checkout_page.card_cvc).to_have_value("123")
+            expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
 
+        logger.info("Попытаться оплатить заказ с некорректным номером карты")
 
-def test_payment_with_invalid_card_number(payment_with_product):
-    checkout_page = payment_with_product
+        with allure.step("Попытаться оплатить заказ"):
+            checkout_page.submit_payment_button.click()
 
-    logger.info("Начинаем тест оплаты с некорректным номером банковской карты")
+        logger.info("Проверить, что пользователь остался на этапе оплаты")
 
-    logger.info("Ввести некорректный номер банковской карты")
+        with allure.step("Проверить, что оплата не выполнена"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
+            expect(checkout_page.card_form).to_be_visible()
 
-    checkout_page.card_pan.fill("1234567890123456")
+    @allure.title("Оплата картой с истёкшим сроком действия")
+    def test_payment_with_expired_card(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Заполнить остальные поля корректными данными")
+        logger.info("Начинаем тест оплаты с истёкшим сроком действия карты")
+        logger.info("Ввести корректный номер банковской карты")
 
-    checkout_page.card_expiry.fill("12/28")
-    checkout_page.card_cvc.fill("123")
-    checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Ввести номер банковской карты"):
+            checkout_page.card_pan.fill("4111111111111111")
 
-    logger.info("Проверить, что данные введены")
+        logger.info("Ввести истёкший срок действия карты")
 
-    expect(checkout_page.card_pan).to_have_value("1234 5678 9012 3456")
-    expect(checkout_page.card_expiry).to_have_value("12/28")
-    expect(checkout_page.card_cvc).to_have_value("123")
-    expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
+        with allure.step("Ввести истёкший срок действия карты"):
+            checkout_page.card_expiry.fill("12/24")
 
-    logger.info("Попытаться оплатить заказ с некорректным номером карты")
+        logger.info("Ввести корректный CVC")
 
-    checkout_page.submit_payment_button.click()
+        with allure.step("Ввести CVC"):
+            checkout_page.card_cvc.fill("123")
 
-    logger.info("Проверить, что пользователь остался на этапе оплаты")
+        logger.info("Ввести имя владельца карты")
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
-    expect(checkout_page.card_form).to_be_visible()
+        with allure.step("Ввести имя владельца карты"):
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
+        logger.info("Проверить введённые данные банковской карты")
 
-def test_payment_with_expired_card(payment_with_product):
-    checkout_page = payment_with_product
+        with allure.step("Проверить введённые данные"):
+            expect(checkout_page.card_pan).to_have_value(
+                "4111 1111 1111 1111"
+            )
+            expect(checkout_page.card_expiry).to_have_value("12/24")
+            expect(checkout_page.card_cvc).to_have_value("123")
+            expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
 
-    logger.info("Начинаем тест оплаты с истёкшим сроком действия карты")
+        logger.info("Попытаться оплатить заказ с просроченной картой")
 
-    logger.info("Ввести корректный номер банковской карты")
+        with allure.step("Попытаться оплатить заказ"):
+            checkout_page.submit_payment_button.click()
 
-    checkout_page.card_pan.fill("4111111111111111")
+        logger.info("Проверить, что пользователь остался на этапе оплаты")
 
-    logger.info("Ввести истёкший срок действия карты")
+        with allure.step("Проверить, что оплата не выполнена"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
+            expect(checkout_page.card_form).to_be_visible()
 
-    checkout_page.card_expiry.fill("12/24")
+    @allure.title("Оплата с некорректным CVC")
+    def test_payment_with_invalid_cvc(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Ввести корректный CVC")
+        logger.info("Начинаем тест оплаты с некорректным CVC")
+        logger.info("Ввести корректный номер банковской карты")
 
-    checkout_page.card_cvc.fill("123")
+        with allure.step("Ввести номер банковской карты"):
+            checkout_page.card_pan.fill("4111111111111111")
 
-    logger.info("Ввести имя владельца карты")
+        logger.info("Ввести корректный срок действия карты")
 
-    checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Ввести срок действия карты"):
+            checkout_page.card_expiry.fill("12/28")
 
-    logger.info("Проверить введённые данные банковской карты")
+        logger.info("Ввести некорректный CVC")
 
-    expect(checkout_page.card_pan).to_have_value("4111 1111 1111 1111")
-    expect(checkout_page.card_expiry).to_have_value("12/24")
-    expect(checkout_page.card_cvc).to_have_value("123")
-    expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
+        with allure.step("Ввести некорректный CVC"):
+            checkout_page.card_cvc.fill("12")
 
-    logger.info("Попытаться оплатить заказ с просроченной картой")
+        logger.info("Ввести имя владельца карты")
 
-    checkout_page.submit_payment_button.click()
+        with allure.step("Ввести имя владельца карты"):
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
-    logger.info("Проверить, что пользователь остался на этапе оплаты")
+        logger.info("Проверить введённые данные банковской карты")
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
-    expect(checkout_page.card_form).to_be_visible()
+        with allure.step("Проверить введённые данные"):
+            expect(checkout_page.card_pan).to_have_value(
+                "4111 1111 1111 1111"
+            )
+            expect(checkout_page.card_expiry).to_have_value("12/28")
+            expect(checkout_page.card_cvc).to_have_value("12")
+            expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
 
+        logger.info("Попытаться оплатить заказ с некорректным CVC")
 
-def test_payment_with_invalid_cvc(payment_with_product):
-    checkout_page = payment_with_product
+        with allure.step("Попытаться оплатить заказ"):
+            checkout_page.submit_payment_button.click()
 
-    logger.info("Начинаем тест оплаты с некорректным CVC")
-    logger.info("Ввести корректный номер банковской карты")
+        logger.info("Проверить, что пользователь остался на этапе оплаты")
 
-    checkout_page.card_pan.fill("4111111111111111")
+        with allure.step("Проверить, что оплата не выполнена"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
+            expect(checkout_page.card_form).to_be_visible()
 
-    logger.info("Ввести корректный срок действия карты")
+    @allure.title("Проверка итоговой стоимости на этапе оплаты")
+    def test_order_total_on_payment_step(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    checkout_page.card_expiry.fill("12/28")
+        logger.info("Начинаем тест проверки итоговой стоимости заказа на этапе оплаты")
+        logger.info("Проверить, что пользователь находится на этапе оплаты")
 
-    logger.info("Ввести некорректный CVC")
+        with allure.step("Проверить отображение страницы оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-    checkout_page.card_cvc.fill("12")
+        logger.info("Проверить отображение стоимости товаров")
 
-    logger.info("Ввести имя владельца карты")
+        with allure.step("Проверить отображение стоимости товаров"):
+            expect(checkout_page.subtotal).to_be_visible()
 
-    checkout_page.card_holder.fill("IVAN IVANOV")
+        logger.info("Проверить отображение стоимости доставки")
 
-    logger.info("Проверить введённые данные банковской карты")
+        with allure.step("Проверить отображение стоимости доставки"):
+            expect(checkout_page.delivery_fee).to_be_visible()
 
-    expect(checkout_page.card_pan).to_have_value("4111 1111 1111 1111")
-    expect(checkout_page.card_expiry).to_have_value("12/28")
-    expect(checkout_page.card_cvc).to_have_value("12")
-    expect(checkout_page.card_holder).to_have_value("IVAN IVANOV")
+        logger.info("Проверить отображение итоговой стоимости заказа")
 
-    logger.info("Попытаться оплатить заказ с некорректным CVC")
+        with allure.step("Проверить отображение итоговой стоимости"):
+            expect(checkout_page.total).to_be_visible()
 
-    checkout_page.submit_payment_button.click()
+        logger.info("Получить стоимость товаров, доставки и итоговую сумму")
 
-    logger.info("Проверить, что пользователь остался на этапе оплаты")
+        with allure.step("Получить суммы заказа"):
+            subtotal = checkout_page.subtotal.inner_text()
+            delivery_fee = checkout_page.delivery_fee.inner_text()
+            total = checkout_page.total.inner_text()
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
-    expect(checkout_page.card_form).to_be_visible()
+        logger.info(f"Стоимость товаров: {subtotal}")
+        logger.info(f"Стоимость доставки: {delivery_fee}")
+        logger.info(f"Итоговая стоимость: {total}")
 
+        logger.info("Проверить, что стоимость доставки при самовывозе равна нулю")
 
-def test_order_total_on_payment_step(payment_with_product):
-    checkout_page = payment_with_product
+        with allure.step("Проверить стоимость заказа при самовывозе"):
+            assert checkout_page.delivery_fee.get_attribute("data-cents") == "0"
+            assert total == subtotal
 
-    logger.info("Начинаем тест проверки итоговой стоимости заказа на этапе оплаты")
+    @allure.title("Успешная оплата заказа банковской картой")
+    def test_successful_payment_with_valid_card(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Проверить, что пользователь находится на этапе оплаты")
+        logger.info("Начинаем тест успешной оплаты заказа банковской картой")
+        logger.info("Проверить, что пользователь находится на этапе оплаты")
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
+        with allure.step("Проверить отображение страницы оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-    logger.info("Проверить отображение стоимости товаров")
+        logger.info("Ввести корректный номер банковской карты")
 
-    expect(checkout_page.subtotal).to_be_visible()
+        with allure.step("Ввести номер банковской карты"):
+            checkout_page.card_pan.fill("4111111111111111")
 
-    logger.info("Проверить отображение стоимости доставки")
+        logger.info("Ввести корректный срок действия карты")
 
-    expect(checkout_page.delivery_fee).to_be_visible()
+        with allure.step("Ввести срок действия карты"):
+            checkout_page.card_expiry.fill("12/28")
 
-    logger.info("Проверить отображение итоговой стоимости заказа")
+        logger.info("Ввести корректный CVC")
 
-    expect(checkout_page.total).to_be_visible()
+        with allure.step("Ввести CVC"):
+            checkout_page.card_cvc.fill("123")
 
-    logger.info("Получить стоимость товаров, доставки и итоговую сумму")
+        logger.info("Ввести имя владельца карты")
 
-    subtotal = checkout_page.subtotal.inner_text()
-    delivery_fee = checkout_page.delivery_fee.inner_text()
-    total = checkout_page.total.inner_text()
+        with allure.step("Ввести имя владельца карты"):
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
-    logger.info(f"Стоимость товаров: {subtotal}")
-    logger.info(f"Стоимость доставки: {delivery_fee}")
-    logger.info(f"Итоговая стоимость: {total}")
+        logger.info("Нажать кнопку «Оплатить»")
 
-    logger.info("Проверить, что стоимость доставки при самовывозе равна нулю")
+        with allure.step("Нажать кнопку оплаты"):
+            checkout_page.submit_payment_button.click()
 
-    assert checkout_page.delivery_fee.get_attribute("data-cents") == "0"
-    assert total == subtotal
+        logger.info("Проверить появление окна 3D Secure")
 
+        with allure.step("Проверить появление окна 3D Secure"):
+            expect(checkout_page.threeds_modal).to_be_visible()
 
-def test_successful_payment_with_valid_card(payment_with_product):
-    checkout_page = payment_with_product
+        logger.info("Получить тестовый SMS-код")
 
-    logger.info("Начинаем тест успешной оплаты заказа банковской картой")
-    logger.info("Проверить, что пользователь находится на этапе оплаты")
+        with allure.step("Получить тестовый SMS-код"):
+            otp_code = checkout_page.threeds_otp_hint.get_attribute("data-otp")
+            assert otp_code is not None, "Не удалось получить SMS-код"
 
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
+        logger.info("Ввести SMS-код подтверждения")
 
-    logger.info("Ввести корректный номер банковской карты")
+        with allure.step("Ввести SMS-код подтверждения"):
+            checkout_page.threeds_otp.fill(otp_code)
 
-    checkout_page.card_pan.fill("4111111111111111")
+        logger.info("Проверить, что кнопка подтверждения активна")
 
-    logger.info("Ввести корректный срок действия карты")
+        with allure.step("Проверить доступность кнопки подтверждения"):
+            expect(checkout_page.threeds_confirm_button).to_be_enabled()
 
-    checkout_page.card_expiry.fill("12/28")
+        logger.info("Подтвердить оплату")
 
-    logger.info("Ввести корректный CVC")
+        with allure.step("Подтвердить оплату"):
+            checkout_page.threeds_confirm_button.click()
 
-    checkout_page.card_cvc.fill("123")
+        logger.info("Проверить закрытие окна 3D Secure")
 
-    logger.info("Ввести имя владельца карты")
+        with allure.step("Проверить завершение оплаты"):
+            expect(checkout_page.threeds_modal).not_to_be_visible()
+            expect(checkout_page.card_form).not_to_be_visible()
 
-    checkout_page.card_holder.fill("IVAN IVANOV")
+    @allure.title("Оплата с некорректным кодом 3D Secure")
+    def test_payment_with_invalid_3ds_code(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Нажать кнопку «Оплатить»")
+        logger.info("Начинаем тест оплаты с некорректным кодом 3D Secure")
+        logger.info("Ввести корректный номер банковской карты")
 
-    checkout_page.submit_payment_button.click()
+        with allure.step("Ввести номер банковской карты"):
+            checkout_page.card_pan.fill("4111111111111111")
 
-    logger.info("Проверить появление окна 3D Secure")
+        logger.info("Ввести корректный срок действия карты")
 
-    expect(checkout_page.threeds_modal).to_be_visible()
+        with allure.step("Ввести срок действия карты"):
+            checkout_page.card_expiry.fill("12/28")
 
-    logger.info("Получить тестовый SMS-код")
+        logger.info("Ввести корректный CVC")
 
-    otp_code = checkout_page.threeds_otp_hint.get_attribute("data-otp")
+        with allure.step("Ввести CVC"):
+            checkout_page.card_cvc.fill("123")
 
-    assert otp_code is not None, "Не удалось получить SMS-код"
+        logger.info("Ввести имя владельца карты")
 
-    logger.info("Ввести SMS-код подтверждения")
+        with allure.step("Ввести имя владельца карты"):
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
-    checkout_page.threeds_otp.fill(otp_code)
+        logger.info("Нажать кнопку «Оплатить»")
 
-    logger.info("Проверить, что кнопка подтверждения активна")
+        with allure.step("Нажать кнопку оплаты"):
+            checkout_page.submit_payment_button.click()
 
-    expect(checkout_page.threeds_confirm_button).to_be_enabled()
+        logger.info("Проверить появление окна 3D Secure")
 
-    logger.info("Подтвердить оплату")
+        with allure.step("Проверить появление окна 3D Secure"):
+            expect(checkout_page.threeds_modal).to_be_visible()
 
-    checkout_page.threeds_confirm_button.click()
+        logger.info("Получить корректный SMS-код")
 
-    logger.info("Проверить закрытие окна 3D Secure")
+        with allure.step("Получить корректный SMS-код"):
+            correct_otp = checkout_page.threeds_otp_hint.get_attribute(
+                "data-otp"
+            )
+            assert correct_otp is not None, "Не удалось получить SMS-код"
 
-    expect(checkout_page.threeds_modal).not_to_be_visible()
-    expect(checkout_page.card_form).not_to_be_visible()
+        logger.info("Сформировать некорректный SMS-код")
 
+        with allure.step("Сформировать некорректный SMS-код"):
+            invalid_otp = "000000" if correct_otp != "000000" else "111111"
 
-def test_payment_with_invalid_3ds_code(payment_with_product):
-    checkout_page = payment_with_product
+        logger.info("Ввести некорректный SMS-код")
 
-    logger.info("Начинаем тест оплаты с некорректным кодом 3D Secure")
-    logger.info("Ввести корректный номер банковской карты")
+        with allure.step("Ввести некорректный SMS-код"):
+            checkout_page.threeds_otp.fill(invalid_otp)
 
-    checkout_page.card_pan.fill("4111111111111111")
+        logger.info("Проверить, что кнопка подтверждения активна")
 
-    logger.info("Ввести корректный срок действия карты")
+        with allure.step("Проверить доступность кнопки подтверждения"):
+            expect(checkout_page.threeds_confirm_button).to_be_enabled()
 
-    checkout_page.card_expiry.fill("12/28")
+        logger.info("Подтвердить оплату с некорректным SMS-кодом")
 
-    logger.info("Ввести корректный CVC")
+        with allure.step("Подтвердить оплату с неверным кодом"):
+            checkout_page.threeds_confirm_button.click()
 
-    checkout_page.card_cvc.fill("123")
+        logger.info("Проверить, что окно 3D Secure осталось открытым")
 
-    logger.info("Ввести имя владельца карты")
+        with allure.step("Проверить, что окно 3D Secure осталось открытым"):
+            expect(checkout_page.threeds_modal).to_be_visible()
 
-    checkout_page.card_holder.fill("IVAN IVANOV")
+        logger.info("Проверить, что пользователь остался на этапе оплаты")
 
-    logger.info("Нажать кнопку «Оплатить»")
+        with allure.step("Проверить доступность формы оплаты"):
+            expect(checkout_page.card_form).to_be_visible()
 
-    checkout_page.submit_payment_button.click()
+    @allure.title("Подтверждение оплаты с пустым кодом 3D Secure")
+    def test_payment_with_empty_3ds_code(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Проверить появление окна 3D Secure")
+        logger.info("Начинаем тест подтверждения оплаты с пустым SMS-кодом")
+        logger.info("Ввести корректный номер банковской карты")
 
-    expect(checkout_page.threeds_modal).to_be_visible()
+        with allure.step("Ввести номер банковской карты"):
+            checkout_page.card_pan.fill("4111111111111111")
 
-    logger.info("Получить корректный SMS-код")
+        logger.info("Ввести корректный срок действия карты")
 
-    correct_otp = checkout_page.threeds_otp_hint.get_attribute("data-otp")
+        with allure.step("Ввести срок действия карты"):
+            checkout_page.card_expiry.fill("12/28")
 
-    assert correct_otp is not None, "Не удалось получить SMS-код"
+        logger.info("Ввести корректный CVC")
 
-    logger.info("Сформировать некорректный SMS-код")
+        with allure.step("Ввести CVC"):
+            checkout_page.card_cvc.fill("123")
 
-    invalid_otp = "000000" if correct_otp != "000000" else "111111"
+        logger.info("Ввести имя владельца карты")
 
-    logger.info("Ввести некорректный SMS-код")
+        with allure.step("Ввести имя владельца карты"):
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
-    checkout_page.threeds_otp.fill(invalid_otp)
+        logger.info("Нажать кнопку «Оплатить»")
 
-    logger.info("Проверить, что кнопка подтверждения активна")
+        with allure.step("Нажать кнопку оплаты"):
+            checkout_page.submit_payment_button.click()
 
-    expect(checkout_page.threeds_confirm_button).to_be_enabled()
+        logger.info("Проверить появление окна 3D Secure")
 
-    logger.info("Подтвердить оплату с некорректным SMS-кодом")
+        with allure.step("Проверить появление окна 3D Secure"):
+            expect(checkout_page.threeds_modal).to_be_visible()
 
-    checkout_page.threeds_confirm_button.click()
+        logger.info("Проверить, что поле SMS-кода пустое")
 
-    logger.info("Проверить, что окно 3D Secure осталось открытым")
+        with allure.step("Проверить пустое поле SMS-кода"):
+            expect(checkout_page.threeds_otp).to_be_empty()
 
-    expect(checkout_page.threeds_modal).to_be_visible()
+        logger.info("Проверить, что кнопка подтверждения неактивна")
 
-    logger.info("Проверить, что пользователь остался на этапе оплаты")
+        with allure.step("Проверить недоступность кнопки подтверждения"):
+            expect(checkout_page.threeds_confirm_button).to_be_disabled()
 
-    expect(checkout_page.card_form).to_be_visible()
+        logger.info("Проверить, что окно 3D Secure осталось открытым")
 
+        with allure.step("Проверить отображение окна 3D Secure"):
+            expect(checkout_page.threeds_modal).to_be_visible()
 
-def test_payment_with_empty_3ds_code(payment_with_product):
-    checkout_page = payment_with_product
+        logger.info("Проверить, что форма оплаты остаётся доступной")
 
-    logger.info("Начинаем тест подтверждения оплаты с пустым SMS-кодом")
-    logger.info("Ввести корректный номер банковской карты")
+        with allure.step("Проверить доступность формы оплаты"):
+            expect(checkout_page.card_form).to_be_visible()
 
-    checkout_page.card_pan.fill("4111111111111111")
+    @allure.title("Отмена оплаты через 3D Secure")
+    def test_cancel_3ds_payment(self, payment_with_product):
+        checkout_page = payment_with_product
 
-    logger.info("Ввести корректный срок действия карты")
+        logger.info("Начинаем тест отмены оплаты через 3D Secure")
+        logger.info("Ввести корректный номер банковской карты")
 
-    checkout_page.card_expiry.fill("12/28")
+        with allure.step("Ввести номер банковской карты"):
+            checkout_page.card_pan.fill("4111111111111111")
 
-    logger.info("Ввести корректный CVC")
+        logger.info("Ввести корректный срок действия карты")
 
-    checkout_page.card_cvc.fill("123")
+        with allure.step("Ввести срок действия карты"):
+            checkout_page.card_expiry.fill("12/28")
 
-    logger.info("Ввести имя владельца карты")
+        logger.info("Ввести корректный CVC")
 
-    checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Ввести CVC"):
+            checkout_page.card_cvc.fill("123")
 
-    logger.info("Нажать кнопку «Оплатить»")
+        logger.info("Ввести имя владельца карты")
 
-    checkout_page.submit_payment_button.click()
+        with allure.step("Ввести имя владельца карты"):
+            checkout_page.card_holder.fill("IVAN IVANOV")
 
-    logger.info("Проверить появление окна 3D Secure")
+        logger.info("Нажать кнопку «Оплатить»")
 
-    expect(checkout_page.threeds_modal).to_be_visible()
+        with allure.step("Нажать кнопку оплаты"):
+            checkout_page.submit_payment_button.click()
 
-    logger.info("Проверить, что поле SMS-кода пустое")
+        logger.info("Проверить появление окна 3D Secure")
 
-    expect(checkout_page.threeds_otp).to_be_empty()
+        with allure.step("Проверить появление окна 3D Secure"):
+            expect(checkout_page.threeds_modal).to_be_visible()
 
-    logger.info("Проверить, что кнопка подтверждения неактивна")
+        logger.info("Проверить отображение кнопки «Отмена»")
 
-    expect(checkout_page.threeds_confirm_button).to_be_disabled()
+        with allure.step("Проверить отображение кнопки отмены"):
+            expect(checkout_page.threeds_cancel_button).to_be_visible()
 
-    logger.info("Проверить, что окно 3D Secure осталось открытым")
+        logger.info("Нажать кнопку «Отмена»")
 
-    expect(checkout_page.threeds_modal).to_be_visible()
+        with allure.step("Отменить оплату"):
+            checkout_page.threeds_cancel_button.click()
 
-    logger.info("Проверить, что форма оплаты остаётся доступной")
+        logger.info("Проверить закрытие окна 3D Secure")
 
-    expect(checkout_page.card_form).to_be_visible()
+        with allure.step("Проверить закрытие окна 3D Secure"):
+            expect(checkout_page.threeds_modal).not_to_be_visible()
 
+        logger.info("Проверить, что пользователь остался на этапе оплаты")
 
-def test_cancel_3ds_payment(payment_with_product):
-    checkout_page = payment_with_product
+        with allure.step("Проверить отображение страницы оплаты"):
+            expect(
+                checkout_page.page.get_by_role("heading", name="Оплата")
+            ).to_be_visible()
 
-    logger.info("Начинаем тест отмены оплаты через 3D Secure")
+        logger.info("Проверить, что форма оплаты осталась доступна")
 
-    logger.info("Ввести корректный номер банковской карты")
+        with allure.step("Проверить доступность формы оплаты"):
+            expect(checkout_page.card_form).to_be_visible()
 
-    checkout_page.card_pan.fill("4111111111111111")
+        logger.info("Проверить, что кнопка оплаты снова активна")
 
-    logger.info("Ввести корректный срок действия карты")
-
-    checkout_page.card_expiry.fill("12/28")
-
-    logger.info("Ввести корректный CVC")
-
-    checkout_page.card_cvc.fill("123")
-
-    logger.info("Ввести имя владельца карты")
-
-    checkout_page.card_holder.fill("IVAN IVANOV")
-
-    logger.info("Нажать кнопку «Оплатить»")
-
-    checkout_page.submit_payment_button.click()
-
-    logger.info("Проверить появление окна 3D Secure")
-
-    expect(checkout_page.threeds_modal).to_be_visible()
-
-    logger.info("Проверить отображение кнопки «Отмена»")
-
-    expect(checkout_page.threeds_cancel_button).to_be_visible()
-
-    logger.info("Нажать кнопку «Отмена»")
-
-    checkout_page.threeds_cancel_button.click()
-
-    logger.info("Проверить закрытие окна 3D Secure")
-
-    expect(checkout_page.threeds_modal).not_to_be_visible()
-
-    logger.info("Проверить, что пользователь остался на этапе оплаты")
-
-    expect(
-        checkout_page.page.get_by_role("heading", name="Оплата")
-    ).to_be_visible()
-
-    logger.info("Проверить, что форма оплаты осталась доступна")
-
-    expect(checkout_page.card_form).to_be_visible()
-
-    logger.info("Проверить, что кнопка оплаты снова активна")
-
-    expect(checkout_page.submit_payment_button).to_be_enabled()
+        with allure.step("Проверить доступность кнопки оплаты"):
+            expect(checkout_page.submit_payment_button).to_be_enabled()

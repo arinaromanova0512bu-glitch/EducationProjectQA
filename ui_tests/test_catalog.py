@@ -1,250 +1,314 @@
 import logging
 
+import allure
 from playwright.sync_api import expect
 
 logger = logging.getLogger(__name__)
 
 
-def test_catalog_displays_products(logged_in_catalog):
-    logger.info("Начинаем тест отображения товаров")
+@allure.epic("Интернет-магазин")
+@allure.feature("Каталог")
+@allure.story("Отображение и поиск товаров")
+class TestCatalogProducts:
 
-    catalog_page = logged_in_catalog
+    @allure.title("Отображение товаров в каталоге")
+    def test_catalog_displays_products(self, logged_in_catalog):
+        logger.info("Начинаем тест отображения товаров")
 
-    logger.info("Проверяем отображение товаров в каталоге")
+        catalog_page = logged_in_catalog
 
-    expect(catalog_page.product_cards.first).to_be_visible()
+        logger.info("Проверяем отображение товаров в каталоге")
 
+        with allure.step("Проверить отображение товаров в каталоге"):
+            expect(catalog_page.product_cards.first).to_be_visible()
 
-def test_catalog_search(logged_in_catalog):
-    logger.info("Начинаем тест поиска товаров")
+    @allure.title("Поиск товаров в каталоге")
+    def test_catalog_search(self, logged_in_catalog):
+        logger.info("Начинаем тест поиска товаров")
 
-    catalog_page = logged_in_catalog
+        catalog_page = logged_in_catalog
 
-    catalog_page.search("iPhone")
+        with allure.step("Выполнить поиск товара iPhone"):
+            catalog_page.search("iPhone")
 
-    logger.info("Проверяем результат поиска")
+        logger.info("Проверяем результат поиска")
 
-    catalog_page.page.wait_for_function(
-        """() => {
-            const cards = document.querySelectorAll(
-                '[data-testid="product-card"]'
-            );
-
-            return cards.length > 0 &&
-                Array.from(cards).every(card => {
-                    const name = card.querySelector(
-                        '[data-testid="product-name"]'
+        with allure.step("Дождаться отображения товаров iPhone"):
+            catalog_page.page.wait_for_function(
+                """() => {
+                    const cards = document.querySelectorAll(
+                        '[data-testid="product-card"]'
                     );
 
-                    return name &&
-                        name.textContent.toLowerCase().includes('iphone');
-                });
-        }"""
-    )
+                    return cards.length > 0 &&
+                        Array.from(cards).every(card => {
+                            const name = card.querySelector(
+                                '[data-testid="product-name"]'
+                            );
 
-    cards_count = catalog_page.product_cards.count()
+                            return name &&
+                                name.textContent.toLowerCase().includes('iphone');
+                        });
+                }"""
+            )
 
-    logger.info(f"Количество найденных товаров: {cards_count}")
+        with allure.step("Получить количество найденных товаров"):
+            cards_count = catalog_page.product_cards.count()
 
-    assert cards_count > 0
+        logger.info(f"Количество найденных товаров: {cards_count}")
 
-
-def test_catalog_category_filter(logged_in_catalog):
-    logger.info("Начинаем тест фильтрации по категории")
-
-    catalog_page = logged_in_catalog
-
-    catalog_page.select_smartphones()
-
-    expect(catalog_page.smartphones_filter).to_have_attribute(
-        "data-active", "true"
-    )
-
-    category_id = catalog_page.smartphones_filter.get_attribute(
-        "data-category-id"
-    )
-
-    assert category_id is not None
-
-    catalog_page.page.wait_for_function(
-        """(categoryId) => {
-            const cards = document.querySelectorAll(
-                '[data-testid="product-card"]'
-            );
-            return cards.length > 0 &&
-                Array.from(cards).every(card =>
-                    card.getAttribute('data-category-id') === categoryId
-                );
-        }""",
-        arg=category_id
-    )
-    cards_count = catalog_page.product_cards.count()
-
-    logger.info(f"Количество смартфонов: {cards_count}")
-
-    assert cards_count > 0
-
-    for i in range(cards_count):
-        product_card = catalog_page.product_cards.nth(i)
-        product_category = product_card.get_attribute(
-            "data-category-id"
-        )
-        logger.info(
-            f"Товар {i}: категория {product_category}"
-        )
-        assert product_category == category_id
+        with allure.step("Проверить, что товары найдены"):
+            assert cards_count > 0
 
 
-def test_catalog_brand_filter(logged_in_catalog):
-    logger.info("Начинаем тест фильтрации по бренду")
+@allure.epic("Интернет-магазин")
+@allure.feature("Каталог")
+@allure.story("Фильтрация товаров")
+class TestCatalogFilters:
 
-    catalog_page = logged_in_catalog
+    @allure.title("Фильтрация товаров по категории")
+    def test_catalog_category_filter(self, logged_in_catalog):
+        logger.info("Начинаем тест фильтрации по категории")
 
-    catalog_page.select_brand()
+        catalog_page = logged_in_catalog
 
-    expect(catalog_page.brand_filter).to_have_attribute(
-        "data-active", "true"
-    )
-    catalog_page.page.wait_for_function(
-        """() => {
-            const cards = document.querySelectorAll(
-                '[data-testid="product-card"]'
-            );
-            return cards.length > 0 &&
-                Array.from(cards).every(card =>
-                    card.getAttribute('data-brand') === 'apple'
-                );
-        }"""
-    )
-    cards_count = catalog_page.product_cards.count()
+        with allure.step("Выбрать категорию смартфонов"):
+            catalog_page.select_smartphones()
 
-    logger.info(f"Количество товаров Apple: {cards_count}")
+        with allure.step("Проверить активность фильтра смартфонов"):
+            expect(catalog_page.smartphones_filter).to_have_attribute(
+                "data-active", "true"
+            )
 
-    assert cards_count > 0
+        with allure.step("Получить идентификатор категории"):
+            category_id = catalog_page.smartphones_filter.get_attribute(
+                "data-category-id"
+            )
 
-    for i in range(cards_count):
-        product_card = catalog_page.product_cards.nth(i)
+            assert category_id is not None
 
-        product_brand = product_card.get_attribute(
-            "data-brand"
-        )
+        with allure.step("Дождаться фильтрации товаров по категории"):
+            catalog_page.page.wait_for_function(
+                """(categoryId) => {
+                    const cards = document.querySelectorAll(
+                        '[data-testid="product-card"]'
+                    );
+                    return cards.length > 0 &&
+                        Array.from(cards).every(card =>
+                            card.getAttribute('data-category-id') === categoryId
+                        );
+                }""",
+                arg=category_id
+            )
 
-        logger.info(f"Товар {i}: бренд {product_brand}")
+        with allure.step("Получить количество смартфонов"):
+            cards_count = catalog_page.product_cards.count()
 
-        assert product_brand == "apple"
+        logger.info(f"Количество смартфонов: {cards_count}")
+
+        with allure.step("Проверить наличие товаров"):
+            assert cards_count > 0
+
+        with allure.step("Проверить категорию каждого товара"):
+            for i in range(cards_count):
+                product_card = catalog_page.product_cards.nth(i)
+                product_category = product_card.get_attribute(
+                    "data-category-id"
+                )
+                logger.info(
+                    f"Товар {i}: категория {product_category}"
+                )
+                assert product_category == category_id
+
+    @allure.title("Фильтрация товаров по бренду")
+    def test_catalog_brand_filter(self, logged_in_catalog):
+        logger.info("Начинаем тест фильтрации по бренду")
+
+        catalog_page = logged_in_catalog
+
+        with allure.step("Выбрать бренд Apple"):
+            catalog_page.select_brand()
+
+        with allure.step("Проверить активность фильтра бренда"):
+            expect(catalog_page.brand_filter).to_have_attribute(
+                "data-active", "true"
+            )
+
+        with allure.step("Дождаться отображения товаров Apple"):
+            catalog_page.page.wait_for_function(
+                """() => {
+                    const cards = document.querySelectorAll(
+                        '[data-testid="product-card"]'
+                    );
+                    return cards.length > 0 &&
+                        Array.from(cards).every(card =>
+                            card.getAttribute('data-brand') === 'apple'
+                        );
+                }"""
+            )
+
+        with allure.step("Получить количество товаров Apple"):
+            cards_count = catalog_page.product_cards.count()
+
+        logger.info(f"Количество товаров Apple: {cards_count}")
+
+        with allure.step("Проверить наличие товаров"):
+            assert cards_count > 0
+
+        with allure.step("Проверить бренд каждого товара"):
+            for i in range(cards_count):
+                product_card = catalog_page.product_cards.nth(i)
+
+                product_brand = product_card.get_attribute(
+                    "data-brand"
+                )
+
+                logger.info(f"Товар {i}: бренд {product_brand}")
+
+                assert product_brand == "apple"
+
+    @allure.title("Сброс фильтров каталога")
+    def test_catalog_reset_filters(self, logged_in_catalog):
+        logger.info("Начинаем тест сброса фильтров")
+
+        catalog_page = logged_in_catalog
+
+        with allure.step("Проверить отображение товаров"):
+            expect(catalog_page.product_cards.first).to_be_visible()
+
+        with allure.step("Получить исходное количество товаров"):
+            initial_count = catalog_page.product_cards.count()
+
+        logger.info(f"Количество товаров до фильтрации: {initial_count}")
+
+        with allure.step("Применить фильтр по бренду Apple"):
+            catalog_page.select_brand()
+
+        with allure.step("Проверить активность фильтра"):
+            expect(catalog_page.brand_filter).to_have_attribute(
+                "data-active", "true"
+            )
+
+        with allure.step("Дождаться отображения товаров Apple"):
+            catalog_page.page.wait_for_function(
+                """() => {
+                    const cards = document.querySelectorAll(
+                        '[data-testid="product-card"]'
+                    );
+                    return cards.length > 0 &&
+                        Array.from(cards).every(card =>
+                            card.getAttribute('data-brand') === 'apple'
+                        );
+                }"""
+            )
+
+        with allure.step("Получить количество товаров Apple"):
+            cards_count = catalog_page.product_cards.count()
+
+        logger.info(f"Количество товаров Apple: {cards_count}")
+
+        with allure.step("Проверить наличие товаров"):
+            assert cards_count > 0
+
+        with allure.step("Проверить бренд каждого товара"):
+            for i in range(cards_count):
+                product_card = catalog_page.product_cards.nth(i)
+
+                product_brand = product_card.get_attribute(
+                    "data-brand"
+                )
+
+                logger.info(f"Товар {i}: бренд {product_brand}")
+
+                assert product_brand == "apple"
+
+        with allure.step("Сбросить фильтры каталога"):
+            catalog_page.reset_filters()
+
+        with allure.step("Проверить, что фильтр бренда неактивен"):
+            expect(catalog_page.brand_filter).to_have_attribute(
+                "data-active", "false"
+            )
+
+        with allure.step("Проверить восстановление количества товаров"):
+            expect(catalog_page.product_cards).to_have_count(initial_count)
+
+        with allure.step("Получить бренды товаров после сброса"):
+            brands = []
+
+            cards_count = catalog_page.product_cards.count()
+
+            for i in range(cards_count):
+                product_card = catalog_page.product_cards.nth(i)
+                brand = product_card.get_attribute("data-brand")
+                brands.append(brand)
+
+        logger.info(f"Бренды после сброса: {brands}")
+
+        with allure.step("Проверить наличие товаров других брендов"):
+            assert any(brand != "apple" for brand in brands)
 
 
-def test_catalog_sorting(logged_in_catalog):
-    logger.info("Начинаем тест сортировки товаров")
+@allure.epic("Интернет-магазин")
+@allure.feature("Каталог")
+@allure.story("Сортировка товаров")
+class TestCatalogSorting:
 
-    catalog_page = logged_in_catalog
+    @allure.title("Сортировка товаров по возрастанию цены")
+    def test_catalog_sorting(self, logged_in_catalog):
+        logger.info("Начинаем тест сортировки товаров")
 
-    catalog_page.sort_by_price_ascending()
+        catalog_page = logged_in_catalog
 
-    expect(catalog_page.sort_dropdown).to_have_value(
-        "price_asc"
-    )
-    catalog_page.page.wait_for_function(
-        """() => {
-            const elements = document.querySelectorAll(
-                '[data-testid="product-price"]'
-            );
+        with allure.step("Выбрать сортировку по возрастанию цены"):
+            catalog_page.sort_by_price_ascending()
 
-            if (elements.length < 2) {
-                return false;
-            }
+        with allure.step("Проверить выбранный вариант сортировки"):
+            expect(catalog_page.sort_dropdown).to_have_value(
+                "price_asc"
+            )
 
-            const prices = Array.from(elements).map(element => {
-                const value = element.getAttribute('data-price-cents');
+        with allure.step("Дождаться сортировки товаров"):
+            catalog_page.page.wait_for_function(
+                """() => {
+                    const elements = document.querySelectorAll(
+                        '[data-testid="product-price"]'
+                    );
 
-                return value === null ? NaN : Number(value);
-            });
+                    if (elements.length < 2) {
+                        return false;
+                    }
 
-            return prices.every(Number.isFinite) &&
-                prices.every((price, index) =>
-                    index === 0 || price >= prices[index - 1]
-                );
-        }"""
-    )
-    prices_count = catalog_page.product_prices.count()
+                    const prices = Array.from(elements).map(element => {
+                        const value = element.getAttribute('data-price-cents');
 
-    assert prices_count > 1
+                        return value === null ? NaN : Number(value);
+                    });
 
-    prices = []
+                    return prices.every(Number.isFinite) &&
+                        prices.every((price, index) =>
+                            index === 0 || price >= prices[index - 1]
+                        );
+                }"""
+            )
 
-    for i in range(prices_count):
-        price_element = catalog_page.product_prices.nth(i)
-        price = int(
-            price_element.get_attribute("data-price-cents")
-        )
-        prices.append(price)
+        with allure.step("Получить количество цен товаров"):
+            prices_count = catalog_page.product_prices.count()
 
-    logger.info(f"Цены товаров: {prices}")
+        with allure.step("Проверить наличие минимум двух товаров"):
+            assert prices_count > 1
 
-    assert prices == sorted(prices)
+        with allure.step("Собрать цены всех товаров"):
+            prices = []
 
+            for i in range(prices_count):
+                price_element = catalog_page.product_prices.nth(i)
+                price = int(
+                    price_element.get_attribute("data-price-cents")
+                )
+                prices.append(price)
 
-def test_catalog_reset_filters(logged_in_catalog):
-    logger.info("Начинаем тест сброса фильтров")
+        logger.info(f"Цены товаров: {prices}")
 
-    catalog_page = logged_in_catalog
-
-    expect(catalog_page.product_cards.first).to_be_visible()
-
-    initial_count = catalog_page.product_cards.count()
-
-    logger.info(f"Количество товаров до фильтрации: {initial_count}")
-
-    catalog_page.select_brand()
-
-    expect(catalog_page.brand_filter).to_have_attribute(
-        "data-active", "true"
-    )
-    catalog_page.page.wait_for_function(
-        """() => {
-            const cards = document.querySelectorAll(
-                '[data-testid="product-card"]'
-            );
-            return cards.length > 0 &&
-                Array.from(cards).every(card =>
-                    card.getAttribute('data-brand') === 'apple'
-                );
-        }"""
-    )
-    cards_count = catalog_page.product_cards.count()
-
-    logger.info(f"Количество товаров Apple: {cards_count}")
-
-    assert cards_count > 0
-
-    for i in range(cards_count):
-        product_card = catalog_page.product_cards.nth(i)
-
-        product_brand = product_card.get_attribute(
-            "data-brand"
-        )
-
-        logger.info(f"Товар {i}: бренд {product_brand}")
-
-        assert product_brand == "apple"
-
-    catalog_page.reset_filters()
-
-    expect(catalog_page.brand_filter).to_have_attribute(
-        "data-active", "false"
-    )
-
-    expect(catalog_page.product_cards).to_have_count(initial_count)
-
-    brands = []
-
-    cards_count = catalog_page.product_cards.count()
-
-    for i in range(cards_count):
-        product_card = catalog_page.product_cards.nth(i)
-        brand = product_card.get_attribute("data-brand")
-        brands.append(brand)
-
-    logger.info(f"Бренды после сброса: {brands}")
-
-    assert any(brand != "apple" for brand in brands)
+        with allure.step("Проверить сортировку цен по возрастанию"):
+            assert prices == sorted(prices)

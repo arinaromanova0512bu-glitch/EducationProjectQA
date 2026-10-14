@@ -48,6 +48,7 @@ class CartPage(BasePage):
                 )
         ):
             self.click(self.cart_link)
+        expect(self.cart_discount).to_be_visible()
 
     def remove_item(self):
         logger.info("Удаляем товар из корзины")
@@ -78,6 +79,7 @@ class CartPage(BasePage):
             expect(self.promo_clear_button).to_be_hidden()
         else:
             logger.info("Корзина уже без промокода, очищать нечего")
+        expect(self.cart_discount).to_contain_text("0,00")
 
     def proceed_to_checkout(self):
         logger.info("Переходим на чекаут")
