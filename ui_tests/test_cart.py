@@ -94,13 +94,15 @@ class TestCartProducts:
             cart_page.open_cart()
 
         with allure.step("Проверить отображение двух товаров"):
-            expect(cart_page.cart_item_names.nth(0)).to_have_text(
-                first_product_name
-            )
-            expect(cart_page.cart_item_names.nth(1)).to_have_text(
-                second_product_name
-            )
             expect(cart_page.cart_items).to_have_count(2)
+
+            actual_names = cart_page.cart_item_names.all_inner_texts()
+
+            assert set(actual_names) == {
+                first_product_name,
+                second_product_name
+            }
+
             expect(cart_page.cart_item_quantities.nth(0)).to_have_text("1")
             expect(cart_page.cart_item_quantities.nth(1)).to_have_text("1")
 

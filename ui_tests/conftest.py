@@ -35,12 +35,13 @@ def new_user():
 
 
 @pytest.fixture
-def logged_in_catalog(auth_page, catalog_page):
+def logged_in_catalog(auth_page, catalog_page, new_user):
     auth_page.open(auth_page.url)
 
-    auth_page.login(
-        "admin@store.local",
-        "admin123"
+    auth_page.register(
+        new_user["name"],
+        new_user["email"],
+        new_user["password"]
     )
 
     auth_page.page.wait_for_url("**/#/catalog")
@@ -79,6 +80,31 @@ def checkout_with_product(add_to_cart, cart_page, checkout_page):
     cart_page.open_cart()
     cart_page.proceed_to_checkout()
     expect(checkout_page.courier_button).to_be_visible()
+    return checkout_page
+
+
+@pytest.fixture
+def checkout_with_address(checkout_with_product):
+    checkout_page = checkout_with_product
+
+    checkout_page.select_courier_delivery()
+
+    if not checkout_page.address_form.is_visible():
+        checkout_page.toggle_address_form()
+
+    checkout_page.fill_delivery_address(
+        city="Москва",
+        street="Ленина",
+        building="10",
+        apartment="25",
+        recipient="Анна Иванова",
+        phone="+79999124567"
+    )
+
+    checkout_page.save_delivery_address()
+
+    expect(checkout_page.address_options.first).to_be_visible()
+
     return checkout_page
 
 
@@ -131,3 +157,33 @@ def payment_with_product(checkout_with_product):
 @pytest.fixture
 def orders_page(page):
     return OrdersPage(page)
+
+
+@pytest.fixture
+def paid_order(payment_with_product, orders_page):
+    checkout_page = payment_with_product
+
+    checkout_page.fill_card(
+        "4111111111111111",
+        "12/28",
+        "123",
+        "IVAN IVANOV"
+    )
+
+    checkout_page.submit_payment_button.click()
+
+    expect(checkout_page.threeds_modal).to_be_visible()
+
+    otp_code = checkout_page.threeds_otp_hint.get_attribute("data-otp")
+    assert otp_code, "Не удалось получить SMS-код"
+
+    checkout_page.confirm_3ds(otp_code)
+
+    expect(orders_page.placed_notice).to_be_visible()
+
+    order_id = orders_page.placed_notice.get_attribute("data-order-id")
+    assert order_id, "Не удалось получить ID заказа"
+
+    expect(orders_page.order_cards.first).to_be_visible()
+
+    return orders_page

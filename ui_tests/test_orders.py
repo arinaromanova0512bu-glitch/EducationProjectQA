@@ -33,7 +33,7 @@ class TestOrdersList:
             expect(orders_page.orders_page).to_be_visible()
 
     @allure.title("Отображение списка заказов")
-    def test_orders_list_displayed(self, logged_in_catalog, orders_page):
+    def test_orders_list_displayed(self, paid_order, orders_page):
         logger.info("Начинаем тест отображения списка заказов")
         logger.info("Открыть страницу заказов")
 
@@ -60,7 +60,7 @@ class TestOrdersList:
             )
 
     @allure.title("Количество заказов соответствует счётчику")
-    def test_orders_count_matches_list(self, logged_in_catalog, orders_page):
+    def test_orders_count_matches_list(self, paid_order, orders_page):
         logger.info("Начинаем тест проверки количества заказов")
 
         logger.info("Открыть страницу «Заказы»")
@@ -103,7 +103,7 @@ class TestOrdersList:
 class TestOrderDetails:
 
     @allure.title("Отображение информации в карточке заказа")
-    def test_order_information_displayed(self, logged_in_catalog, orders_page):
+    def test_order_information_displayed(self, paid_order, orders_page):
         logger.info("Начинаем тест отображения информации в карточке заказа")
         logger.info("Открыть страницу «Заказы»")
 
@@ -188,7 +188,7 @@ class TestOrderDetails:
             expect(delivery_info).not_to_be_empty()
 
     @allure.title("Отображение статуса заказа")
-    def test_order_status_displayed(self, logged_in_catalog, orders_page):
+    def test_order_status_displayed(self, paid_order, orders_page):
         logger.info("Начинаем тест отображения статуса заказа")
         logger.info("Открыть страницу «Заказы»")
 
@@ -225,7 +225,7 @@ class TestOrderDetails:
             )
 
     @allure.title("Отображение итоговой стоимости заказа")
-    def test_order_total_displayed(self, logged_in_catalog, orders_page):
+    def test_order_total_displayed(self, paid_order, orders_page):
         logger.info("Начинаем тест отображения итоговой стоимости заказа")
         logger.info("Открыть страницу «Заказы»")
 

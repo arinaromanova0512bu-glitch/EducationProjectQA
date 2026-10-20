@@ -93,3 +93,17 @@ class CheckoutPage(BasePage):
         logger.info("Возврат к выбору доставки")
 
         self.click(self.checkout_back)
+
+    def fill_card(self, number, expiry, cvc, holder):
+        logger.info("Заполнение данных банковской карты")
+
+        self.fill(self.card_pan, number)
+        self.fill(self.card_expiry, expiry)
+        self.fill(self.card_cvc, cvc)
+        self.fill(self.card_holder, holder)
+
+    def confirm_3ds(self, otp_code):
+        logger.info("Подтверждение 3DS")
+
+        self.fill(self.threeds_otp, otp_code)
+        self.click(self.threeds_confirm_button)

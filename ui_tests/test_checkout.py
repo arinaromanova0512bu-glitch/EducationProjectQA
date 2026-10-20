@@ -1,6 +1,7 @@
 import logging
 
 import allure
+from decimal import Decimal
 from playwright.sync_api import expect
 
 logger = logging.getLogger(__name__)
@@ -12,8 +13,8 @@ logger = logging.getLogger(__name__)
 class TestDeliveryMethods:
 
     @allure.title("Выбор курьерской доставки")
-    def test_select_courier_delivery(self, checkout_with_product):
-        checkout_page = checkout_with_product
+    def test_select_courier_delivery(self, checkout_with_address):
+        checkout_page = checkout_with_address
 
         logger.info("Начинаем тест выбора курьерской доставки")
         logger.info("Выбрать способ доставки «Курьер»")
@@ -91,8 +92,8 @@ class TestDeliveryMethods:
             ).to_have_attribute("data-active", "false")
 
     @allure.title("Переключение способов доставки")
-    def test_switch_delivery_methods(self, checkout_with_product):
-        checkout_page = checkout_with_product
+    def test_switch_delivery_methods(self, checkout_with_address):
+        checkout_page = checkout_with_address
 
         logger.info("Начинаем тест выбора опций получения заказа")
         logger.info("Выбрать способ доставки «Самовывоз»")
@@ -368,12 +369,8 @@ class TestCheckoutTotal:
 
         with allure.step("Получить стоимость товаров в копейках"):
             subtotal = checkout_page.subtotal.inner_text()
-            subtotal = int(float(
-                subtotal.replace("\xa0", "")
-                .replace(" ", "")
-                .replace("$", "")
-                .replace(",", ".")
-            ) * 100)
+            subtotal = subtotal.replace("\xa0", "").replace(" ", "").replace("$", "").replace(",", ".")
+            subtotal = int(Decimal(subtotal) * 100)
 
         logger.info("Получить стоимость доставки")
 
@@ -385,13 +382,7 @@ class TestCheckoutTotal:
         logger.info("Получить итоговую стоимость")
 
         with allure.step("Получить итоговую стоимость заказа"):
-            total = checkout_page.total.inner_text()
-            total = int(float(
-                total.replace("\xa0", "")
-                .replace(" ", "")
-                .replace("$", "")
-                .replace(",", ".")
-            ) * 100)
+            total = int(checkout_page.total.get_attribute("data-cents"))
 
         logger.info("Проверить информацию о скидках на странице")
 
@@ -430,12 +421,8 @@ class TestCheckoutTotal:
 
         with allure.step("Получить стоимость товаров в копейках"):
             subtotal = checkout_page.subtotal.inner_text()
-            subtotal = int(float(
-                subtotal.replace("\xa0", "")
-                .replace(" ", "")
-                .replace("$", "")
-                .replace(",", ".")
-            ) * 100)
+            subtotal = subtotal.replace("\xa0", "").replace(" ", "").replace("$", "").replace(",", ".")
+            subtotal = int(Decimal(subtotal) * 100)
 
         logger.info("Получить стоимость доставки")
 
@@ -447,13 +434,7 @@ class TestCheckoutTotal:
         logger.info("Получить итоговую стоимость")
 
         with allure.step("Получить итоговую стоимость заказа"):
-            total = checkout_page.total.inner_text()
-            total = int(float(
-                total.replace("\xa0", "")
-                .replace(" ", "")
-                .replace("$", "")
-                .replace(",", ".")
-            ) * 100)
+            total = int(checkout_page.total.get_attribute("data-cents"))
 
         logger.info("Проверить, что самовывоз бесплатный")
 
@@ -515,8 +496,8 @@ class TestCheckoutNavigation:
             ).to_be_visible()
 
     @allure.title("Переход к оплате при курьерской доставке")
-    def test_proceed_to_payment_with_courier(self, checkout_with_product):
-        checkout_page = checkout_with_product
+    def test_proceed_to_payment_with_courier(self, checkout_with_address):
+        checkout_page = checkout_with_address
 
         logger.info("Начинаем тест перехода к оплате при курьерской доставке")
         logger.info("Выбрать способ доставки «Курьер»")
@@ -644,25 +625,15 @@ class TestPayment:
         checkout_page = payment_with_product
 
         logger.info("Начинаем тест ввода корректных данных банковской карты")
-        logger.info("Ввести номер банковской карты")
+        logger.info("Заполнить корректные данные банковской карты")
 
-        with allure.step("Ввести номер банковской карты"):
-            checkout_page.card_pan.fill("4111111111111111")
-
-        logger.info("Ввести срок действия карты")
-
-        with allure.step("Ввести срок действия карты"):
-            checkout_page.card_expiry.fill("12/28")
-
-        logger.info("Ввести CVC")
-
-        with allure.step("Ввести CVC"):
-            checkout_page.card_cvc.fill("123")
-
-        logger.info("Ввести имя владельца карты")
-
-        with allure.step("Ввести имя владельца карты"):
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить данные банковской карты"):
+            checkout_page.fill_card(
+                "4111111111111111",
+                "12/28",
+                "123",
+                "IVAN IVANOV"
+            )
 
         logger.info("Проверить введённые данные банковской карты")
 
@@ -697,10 +668,7 @@ class TestPayment:
         logger.info("Очистить все поля банковской карты")
 
         with allure.step("Очистить поля банковской карты"):
-            checkout_page.card_pan.fill("")
-            checkout_page.card_expiry.fill("")
-            checkout_page.card_cvc.fill("")
-            checkout_page.card_holder.fill("")
+            checkout_page.fill_card("", "", "", "")
 
         logger.info("Проверить, что все поля банковской карты пустые")
 
@@ -737,17 +705,15 @@ class TestPayment:
         checkout_page = payment_with_product
 
         logger.info("Начинаем тест оплаты с некорректным номером банковской карты")
-        logger.info("Ввести некорректный номер банковской карты")
+        logger.info("Заполнить данные карты с некорректным номером")
 
-        with allure.step("Ввести некорректный номер карты"):
-            checkout_page.card_pan.fill("1234567890123456")
-
-        logger.info("Заполнить остальные поля корректными данными")
-
-        with allure.step("Заполнить остальные поля карты"):
-            checkout_page.card_expiry.fill("12/28")
-            checkout_page.card_cvc.fill("123")
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить карту с некорректным номером"):
+            checkout_page.fill_card(
+                "1234567890123456",
+                "12/28",
+                "123",
+                "IVAN IVANOV"
+            )
 
         logger.info("Проверить, что данные введены")
 
@@ -777,25 +743,15 @@ class TestPayment:
         checkout_page = payment_with_product
 
         logger.info("Начинаем тест оплаты с истёкшим сроком действия карты")
-        logger.info("Ввести корректный номер банковской карты")
+        logger.info("Заполнить данные карты с истёкшим сроком действия")
 
-        with allure.step("Ввести номер банковской карты"):
-            checkout_page.card_pan.fill("4111111111111111")
-
-        logger.info("Ввести истёкший срок действия карты")
-
-        with allure.step("Ввести истёкший срок действия карты"):
-            checkout_page.card_expiry.fill("12/24")
-
-        logger.info("Ввести корректный CVC")
-
-        with allure.step("Ввести CVC"):
-            checkout_page.card_cvc.fill("123")
-
-        logger.info("Ввести имя владельца карты")
-
-        with allure.step("Ввести имя владельца карты"):
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить карту с истёкшим сроком действия"):
+            checkout_page.fill_card(
+                "4111111111111111",
+                "12/24",
+                "123",
+                "IVAN IVANOV"
+            )
 
         logger.info("Проверить введённые данные банковской карты")
 
@@ -825,25 +781,15 @@ class TestPayment:
         checkout_page = payment_with_product
 
         logger.info("Начинаем тест оплаты с некорректным CVC")
-        logger.info("Ввести корректный номер банковской карты")
+        logger.info("Заполнить данные карты с некорректным CVC")
 
-        with allure.step("Ввести номер банковской карты"):
-            checkout_page.card_pan.fill("4111111111111111")
-
-        logger.info("Ввести корректный срок действия карты")
-
-        with allure.step("Ввести срок действия карты"):
-            checkout_page.card_expiry.fill("12/28")
-
-        logger.info("Ввести некорректный CVC")
-
-        with allure.step("Ввести некорректный CVC"):
-            checkout_page.card_cvc.fill("12")
-
-        logger.info("Ввести имя владельца карты")
-
-        with allure.step("Ввести имя владельца карты"):
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить карту с некорректным CVC"):
+            checkout_page.fill_card(
+                "4111111111111111",
+                "12/28",
+                "12",
+                "IVAN IVANOV"
+            )
 
         logger.info("Проверить введённые данные банковской карты")
 
@@ -924,25 +870,15 @@ class TestPayment:
                 checkout_page.page.get_by_role("heading", name="Оплата")
             ).to_be_visible()
 
-        logger.info("Ввести корректный номер банковской карты")
+        logger.info("Заполнить корректные данные банковской карты")
 
-        with allure.step("Ввести номер банковской карты"):
-            checkout_page.card_pan.fill("4111111111111111")
-
-        logger.info("Ввести корректный срок действия карты")
-
-        with allure.step("Ввести срок действия карты"):
-            checkout_page.card_expiry.fill("12/28")
-
-        logger.info("Ввести корректный CVC")
-
-        with allure.step("Ввести CVC"):
-            checkout_page.card_cvc.fill("123")
-
-        logger.info("Ввести имя владельца карты")
-
-        with allure.step("Ввести имя владельца карты"):
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить данные банковской карты"):
+            checkout_page.fill_card(
+                "4111111111111111",
+                "12/28",
+                "123",
+                "IVAN IVANOV"
+            )
 
         logger.info("Нажать кнопку «Оплатить»")
 
@@ -960,14 +896,10 @@ class TestPayment:
             otp_code = checkout_page.threeds_otp_hint.get_attribute("data-otp")
             assert otp_code is not None, "Не удалось получить SMS-код"
 
-        logger.info("Ввести SMS-код подтверждения")
+        logger.info("Проверить доступность кнопки подтверждения после ввода SMS-кода")
 
-        with allure.step("Ввести SMS-код подтверждения"):
+        with allure.step("Ввести SMS-код и проверить кнопку подтверждения"):
             checkout_page.threeds_otp.fill(otp_code)
-
-        logger.info("Проверить, что кнопка подтверждения активна")
-
-        with allure.step("Проверить доступность кнопки подтверждения"):
             expect(checkout_page.threeds_confirm_button).to_be_enabled()
 
         logger.info("Подтвердить оплату")
@@ -988,23 +920,15 @@ class TestPayment:
         logger.info("Начинаем тест оплаты с некорректным кодом 3D Secure")
         logger.info("Ввести корректный номер банковской карты")
 
-        with allure.step("Ввести номер банковской карты"):
-            checkout_page.card_pan.fill("4111111111111111")
+        logger.info("Заполнить корректные данные банковской карты")
 
-        logger.info("Ввести корректный срок действия карты")
-
-        with allure.step("Ввести срок действия карты"):
-            checkout_page.card_expiry.fill("12/28")
-
-        logger.info("Ввести корректный CVC")
-
-        with allure.step("Ввести CVC"):
-            checkout_page.card_cvc.fill("123")
-
-        logger.info("Ввести имя владельца карты")
-
-        with allure.step("Ввести имя владельца карты"):
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить данные банковской карты"):
+            checkout_page.fill_card(
+                "4111111111111111",
+                "12/28",
+                "123",
+                "IVAN IVANOV"
+            )
 
         logger.info("Нажать кнопку «Оплатить»")
 
@@ -1059,25 +983,15 @@ class TestPayment:
         checkout_page = payment_with_product
 
         logger.info("Начинаем тест подтверждения оплаты с пустым SMS-кодом")
-        logger.info("Ввести корректный номер банковской карты")
+        logger.info("Заполнить корректные данные банковской карты")
 
-        with allure.step("Ввести номер банковской карты"):
-            checkout_page.card_pan.fill("4111111111111111")
-
-        logger.info("Ввести корректный срок действия карты")
-
-        with allure.step("Ввести срок действия карты"):
-            checkout_page.card_expiry.fill("12/28")
-
-        logger.info("Ввести корректный CVC")
-
-        with allure.step("Ввести CVC"):
-            checkout_page.card_cvc.fill("123")
-
-        logger.info("Ввести имя владельца карты")
-
-        with allure.step("Ввести имя владельца карты"):
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить данные банковской карты"):
+            checkout_page.fill_card(
+                "4111111111111111",
+                "12/28",
+                "123",
+                "IVAN IVANOV"
+            )
 
         logger.info("Нажать кнопку «Оплатить»")
 
@@ -1114,25 +1028,15 @@ class TestPayment:
         checkout_page = payment_with_product
 
         logger.info("Начинаем тест отмены оплаты через 3D Secure")
-        logger.info("Ввести корректный номер банковской карты")
+        logger.info("Заполнить корректные данные банковской карты")
 
-        with allure.step("Ввести номер банковской карты"):
-            checkout_page.card_pan.fill("4111111111111111")
-
-        logger.info("Ввести корректный срок действия карты")
-
-        with allure.step("Ввести срок действия карты"):
-            checkout_page.card_expiry.fill("12/28")
-
-        logger.info("Ввести корректный CVC")
-
-        with allure.step("Ввести CVC"):
-            checkout_page.card_cvc.fill("123")
-
-        logger.info("Ввести имя владельца карты")
-
-        with allure.step("Ввести имя владельца карты"):
-            checkout_page.card_holder.fill("IVAN IVANOV")
+        with allure.step("Заполнить данные банковской карты"):
+            checkout_page.fill_card(
+                "4111111111111111",
+                "12/28",
+                "123",
+                "IVAN IVANOV"
+            )
 
         logger.info("Нажать кнопку «Оплатить»")
 

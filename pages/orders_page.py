@@ -1,12 +1,17 @@
 import logging
 
+from playwright.sync_api import Page
+
+from config import UI_BASE_URL
+from pages.base_page import BasePage
+
 
 logger = logging.getLogger(__name__)
 
-class OrdersPage:
-    def __init__(self, page):
-        self.page = page
-        self.url = "http://localhost:8081/#/orders"
+class OrdersPage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.url = f"{UI_BASE_URL.rstrip('/')}/#/orders"
 
         self.title = page.get_by_test_id("orders-title")
         self.subtitle = page.get_by_test_id("orders-subtitle")
@@ -26,4 +31,4 @@ class OrdersPage:
 
     def open(self):
         logger.info("Открываем страницу заказов")
-        self.page.goto(self.url)
+        super().open(self.url)

@@ -32,7 +32,6 @@ class CartPage(BasePage):
 
         self.checkout_button = page.get_by_test_id("checkout-button")
         self.clear_cart_button = page.get_by_test_id("clear-cart-button")
-        self.add_to_cart_buttons = page.get_by_test_id("add-to-cart")
         self.promo_clear_button = page.get_by_test_id("promo-clear")
         self.cart_empty = page.get_by_test_id("cart-empty")
 
@@ -68,9 +67,6 @@ class CartPage(BasePage):
         self.fill(self.promo_input, promo_code)
         self.click(self.promo_apply_button)
 
-    def add_to_cart(self):
-        logger.info("Добавляем первый товар из каталога в корзину")
-        self.click(self.add_to_cart_buttons.first)
 
     def remove_promo(self):
         if self.promo_clear_button.is_visible():

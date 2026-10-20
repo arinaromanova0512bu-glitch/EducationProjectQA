@@ -15,7 +15,7 @@ class CatalogPage(BasePage):
         self.product_cards = page.get_by_test_id("product-card")
         self.search_input = page.get_by_test_id("catalog-search")
         self.smartphones_filter = page.get_by_test_id("filter-category-phones")
-        self.brand_filter = page.get_by_test_id("filter-apple-label").locator("..")
+        self.brand_filter = page.get_by_test_id("filter-apple")
 
         self.sort_dropdown = page.get_by_test_id("catalog-sort")
         self.product_prices = page.get_by_test_id("product-price")
