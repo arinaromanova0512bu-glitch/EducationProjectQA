@@ -1,0 +1,10 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: matthewgarcia@example.net
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:16 Начинаем тест отображения товаров
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:20 Проверяем отображение товаров в каталоге

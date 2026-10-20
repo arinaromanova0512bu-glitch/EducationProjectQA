@@ -1,0 +1,27 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: jessicajacobs@example.org
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:125 Начинаем тест фильтрации по бренду
+[32mINFO    [0m pages.catalog_page:catalog_page.py:44 Выбираем бренд
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:153 Количество товаров Apple: 15
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 0: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 1: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 2: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 3: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 4: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 5: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 6: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 7: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 8: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 9: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 10: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 11: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 12: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 13: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:166 Товар 14: бренд apple

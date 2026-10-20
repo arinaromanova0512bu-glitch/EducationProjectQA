@@ -1,0 +1,8 @@
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:36 Начинаем тест логина для пользователя: admin@store.local
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:26 Попытка входа с email: admin@store.local
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:30 Нажата кнопка входа
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:48 Авторизация завершена. Текущий URL: http://localhost:8081/#/catalog

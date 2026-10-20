@@ -1,0 +1,12 @@
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:150 Начинаем тест logout
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:26 Попытка входа с email: admin@store.local
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:30 Нажата кнопка входа
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:165 Пользователь авторизован, выполняем logout
+[32mINFO    [0m pages.catalog_page:catalog_page.py:28 Попытка выхода из аккаунта
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.catalog_page:catalog_page.py:31 Нажата кнопка выхода
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:174 Logout завершён. Текущий URL: http://localhost:8081/#/login

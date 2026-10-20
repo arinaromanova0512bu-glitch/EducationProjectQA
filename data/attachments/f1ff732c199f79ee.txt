@@ -1,0 +1,4 @@
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:17 Начинаем тест открытия страницы авторизации
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.base_page:base_page.py:28 Проверяем видимость элемента
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:25 Страница авторизации успешно открыта

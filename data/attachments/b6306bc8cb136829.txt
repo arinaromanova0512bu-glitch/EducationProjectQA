@@ -1,0 +1,17 @@
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:280 Начинаем тест проверки пустого списка заказов
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:281 Открыть страницу регистрации
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:286 Зарегистрировать нового пользователя
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: michele14@example.com
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:295 Дождаться завершения регистрации
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:300 Открыть страницу «Заказы» через меню
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:305 Проверить переход на страницу заказов
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:310 Проверить отображение заголовка «Заказы»
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:316 Проверить отсутствие карточек заказов
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:321 Проверить сообщение о пустой истории заказов

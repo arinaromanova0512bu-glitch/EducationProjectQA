@@ -1,0 +1,10 @@
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:73 Начинаем тест логина с пустыми полями
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:26 Попытка входа с email: 
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:30 Нажата кнопка входа
+[32mINFO    [0m pages.base_page:base_page.py:36 Проверяем валидность элемента
+[32mINFO    [0m pages.base_page:base_page.py:36 Проверяем валидность элемента
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:85 Поля email и пароля невалидны, если они пустые

@@ -1,0 +1,11 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: amygregory@example.com
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:259 Начинаем тест сортировки товаров
+[32mINFO    [0m pages.catalog_page:catalog_page.py:49 Сортируем товары по возрастанию цены
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:311 Цены товаров: [14900, 17900, 19900, 19900, 19900, 24900, 24900, 24900, 26900, 29900, 29900, 39900, 39900, 49900, 49900, 49900, 54900, 54900, 59900, 59900]

@@ -1,0 +1,30 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: omcgee@example.com
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m pages.cart_page:cart_page.py:39 Переходим в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:77 Корзина уже без промокода, очищать нечего
+[32mINFO    [0m pages.cart_page:cart_page.py:62 Корзина уже пуста, очищать нечего
+[32mINFO    [0m pages.catalog_page:catalog_page.py:59 Возвращаемся в каталог
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.catalog_page:catalog_page.py:64 Добавляем товар с индексом 0 в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:39 Переходим в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:81 Переходим на чекаут
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:147 Начинаем тест открытия и закрытия формы адреса доставки
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:148 Выбрать способ доставки «Курьер»
+[32mINFO    [0m pages.checkout_page:checkout_page.py:55 Выбор курьерской доставки
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:160 Нажать кнопку сворачивания формы адреса
+[32mINFO    [0m pages.checkout_page:checkout_page.py:83 Переключение видимости формы
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:168 Повторно открыть форму адреса
+[32mINFO    [0m pages.checkout_page:checkout_page.py:83 Переключение видимости формы
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент

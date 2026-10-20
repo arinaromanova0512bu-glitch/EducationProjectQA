@@ -1,0 +1,31 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: vrichardson@example.org
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:172 Начинаем тест сброса фильтров
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:182 Количество товаров до фильтрации: 20
+[32mINFO    [0m pages.catalog_page:catalog_page.py:44 Выбираем бренд
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:208 Количество товаров Apple: 15
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 0: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 1: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 2: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 3: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 4: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 5: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 6: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 7: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 8: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 9: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 10: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 11: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 12: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 13: бренд apple
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:221 Товар 14: бренд apple
+[32mINFO    [0m pages.catalog_page:catalog_page.py:54 Сбрасываем фильтры каталога
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:246 Бренды после сброса: ['apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'apple', 'samsung', 'samsung', 'samsung', 'samsung', 'samsung']

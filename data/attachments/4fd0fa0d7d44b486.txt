@@ -1,0 +1,12 @@
+[32mINFO    [0m ui_tests.test_auth:test_auth.py:119 Начинаем тест регистрации нового пользователя
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: admin@store.local
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m pages.auth_page:auth_page.py:42 Получаем сообщение об ошибке авторизации
+[32mINFO    [0m pages.base_page:base_page.py:24 Получаем текст элемента
+[32mINFO    [0m pages.auth_page:auth_page.py:44 Сообщение об ошибке: ошибка регистрации: create user: ERROR: duplicate key value violates unique constraint "users_email_key" (SQLSTATE 23505)

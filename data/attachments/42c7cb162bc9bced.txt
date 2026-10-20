@@ -1,0 +1,67 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: thomaskimberly@example.org
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m pages.cart_page:cart_page.py:39 Переходим в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:77 Корзина уже без промокода, очищать нечего
+[32mINFO    [0m pages.cart_page:cart_page.py:62 Корзина уже пуста, очищать нечего
+[32mINFO    [0m pages.catalog_page:catalog_page.py:59 Возвращаемся в каталог
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.catalog_page:catalog_page.py:64 Добавляем товар с индексом 0 в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:39 Переходим в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:81 Переходим на чекаут
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:360 Проверка расчёта итоговой стоимости заказа при курьерской доставке
+[32mINFO    [0m pages.checkout_page:checkout_page.py:55 Выбор курьерской доставки
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:368 Получить стоимость товаров
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:375 Получить стоимость доставки
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:382 Получить итоговую стоимость
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:387 Проверить информацию о скидках на странице
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:390 STORE
+Каталог
+Корзина 1
+Заказы
+Светлая
+Christine Taylor
+Выйти
+Доставка
+
+Способ получения
+
+iPhone 15
+qty 1 · 799,00 $
+Как получить заказ
+Курьер
+Самовывоз
+
+АДРЕС ДОСТАВКИ
+
+Скрыть форму
+Город
+Улица
+Дом
+Квартира
+Получатель
+Телефон
+Сохранить адрес
+Товары
+799,00 $
+Доставка
+299,00 $
+
+БЕСПЛАТНО ОТ 5 000,00 $
+
+Итого
+1 098,00 $
+К оплате
+Добавлено в корзину
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:394 Вычислить ожидаемую итоговую стоимость
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:399 Сравнить ожидаемую и фактическую стоимость

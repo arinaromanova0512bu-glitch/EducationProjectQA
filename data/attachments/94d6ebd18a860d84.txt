@@ -1,0 +1,13 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: jamesyoung@example.org
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:27 Начинаем тест поиска товаров
+[32mINFO    [0m pages.catalog_page:catalog_page.py:34 Выполняем поиск товаров
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:34 Проверяем результат поиска
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:58 Количество найденных товаров: 3

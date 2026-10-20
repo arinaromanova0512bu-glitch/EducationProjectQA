@@ -1,0 +1,20 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: shawn18@example.net
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:71 Начинаем тест фильтрации по категории
+[32mINFO    [0m pages.catalog_page:catalog_page.py:39 Выбираем категорию смартфонов
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:107 Количество смартфонов: 8
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 0: категория 770e8400-e29b-41d4-a716-446655440001
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 1: категория 770e8400-e29b-41d4-a716-446655440001
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 2: категория 770e8400-e29b-41d4-a716-446655440001
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 3: категория 770e8400-e29b-41d4-a716-446655440001
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 4: категория 770e8400-e29b-41d4-a716-446655440001
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 5: категория 770e8400-e29b-41d4-a716-446655440001
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 6: категория 770e8400-e29b-41d4-a716-446655440001
+[32mINFO    [0m ui_tests.test_catalog:test_catalog.py:118 Товар 7: категория 770e8400-e29b-41d4-a716-446655440001

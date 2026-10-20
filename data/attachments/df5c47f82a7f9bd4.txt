@@ -1,0 +1,19 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: dhughes@example.net
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m pages.catalog_page:catalog_page.py:64 Добавляем товар с индексом 0 в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:39 Переходим в корзину
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.cart_page:cart_page.py:81 Переходим на чекаут
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:292 Проверка невозможности перехода к оплате без адреса доставки
+[32mINFO    [0m pages.checkout_page:checkout_page.py:55 Выбор курьерской доставки
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:299 Проверяем отсутствие сохранённых адресов
+[32mINFO    [0m ui_tests.test_checkout:test_checkout.py:304 Проверяем, что кнопка «К оплате» неактивна

@@ -1,0 +1,14 @@
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081
+[32mINFO    [0m pages.auth_page:auth_page.py:33 Попытка регистрации с email: sandyking@example.net
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:20 Заполняем поле
+[32mINFO    [0m pages.base_page:base_page.py:16 Нажимаем на элемент
+[32mINFO    [0m pages.auth_page:auth_page.py:39 Нажата кнопка регистрации
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:18 Начинаем тест открытия страницы заказов
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:19 Открыть страницу заказов
+[32mINFO    [0m pages.orders_page:orders_page.py:33 Открываем страницу заказов
+[32mINFO    [0m pages.base_page:base_page.py:12 Открываем страницу: http://localhost:8081/#/orders
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:24 Проверить отображение заголовка «Заказы»
+[32mINFO    [0m ui_tests.test_orders:test_orders.py:30 Проверить отображение списка заказов
