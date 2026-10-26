@@ -1,83 +1,186 @@
-# EducationProjectQA
+# E-Commerce QA Automation Project
 
-API test automation project for an e-commerce backend, created as part of my QA Automation training.
+Automated API and UI testing project for an e-commerce application.
 
-The repository contains automated REST API tests covering authentication and user management functionality, including positive and negative scenarios.
+The project demonstrates practical skills in test automation using Python, pytest, Playwright, and REST API testing.
+
+It includes positive and negative test scenarios, reusable API clients, Page Object Model architecture, test fixtures, and Allure reporting.
 
 ## Tech Stack
 
 - Python 3.11
 - pytest
+- Playwright
 - requests
 - Faker
+- Allure Report
 - REST API
+- Page Object Model (POM)
 
 ## Test Coverage
 
-### Authentication
+### API Tests
 
+Automated API tests cover the following functionality:
+
+**Authentication**
 - User registration
 - User login
-- Validation of required fields
-- Invalid credentials
-- Invalid registration data
-- Authentication error scenarios
+- Positive and negative authentication scenarios
+- Input validation
 
-### Users
+**User Management**
+- Retrieve user information
+- Delete users
+- Authorization and access control
+- Invalid and missing access tokens
 
-- Get user by ID
-- Delete user
-- Authorization checks
-- Requests without an access token
-- Requests with an invalid access token
-- Access to another user's data
-- Requests for non-existent users
-- Repeated user deletion
+**Catalog**
+- Product catalog functionality
+- Product-related API scenarios
 
-## Project Structure
+**Shopping Cart**
+- Shopping cart operations
+- Cart-related API scenarios
+
+**Orders**
+- Order management functionality
+- Order-related API scenarios
+
+**Promotions**
+- Promotional functionality
+- Promo-related API scenarios
+
+### UI Tests
+
+UI automation is implemented using Playwright and the Page Object Model pattern.
+
+The test suite covers:
+
+- Authentication
+- Product catalog
+- Shopping cart
+- Checkout
+- Orders
+
+## Project Architecture
+
+The project separates test logic from API interaction and UI page interactions.
 
 ```text
-tests/
-├── api_client.py
-├── conftest.py
-├── test_auth.py
-└── test_users.py
+EducationProjectQA/
+│
+├── api_clients/
+│   ├── auth_client.py
+│   ├── base_http_client.py
+│   ├── cart_client.py
+│   ├── catalog_client.py
+│   ├── order_client.py
+│   └── users_client.py
+│
+├── pages/
+│   ├── auth_page.py
+│   ├── base_page.py
+│   ├── cart_page.py
+│   ├── catalog_page.py
+│   ├── checkout_page.py
+│   └── orders_page.py
+│
+├── tests/
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_cart.py
+│   ├── test_catalog.py
+│   ├── test_orders.py
+│   ├── test_promo.py
+│   └── test_users.py
+│
+├── ui_tests/
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_cart.py
+│   ├── test_catalog.py
+│   ├── test_checkout.py
+│   └── test_orders.py
+│
+├── config.py
+├── pytest.ini
+└── README.md
 ```
-
-- `api_client.py` — API configuration
-- `conftest.py` — shared pytest fixtures and test data
-- `test_auth.py` — authentication and registration tests
-- `test_users.py` — user management tests
 
 ## Running the Tests
 
-Install the required dependencies:
+### 1. Install dependencies
 
 ```bash
-pip install pytest requests Faker
+pip install pytest requests Faker playwright allure-pytest
 ```
 
-Run the complete test suite:
+Install Playwright browsers:
+
+```bash
+playwright install
+```
+
+### 2. Start the application
+
+The application backend is maintained separately and must be running before executing the tests.
+
+Default API address:
+
+```text
+http://localhost:8080
+```
+
+### 3. Run API tests
+
+```bash
+python -m pytest tests/
+```
+
+### 4. Run UI tests
+
+```bash
+python -m pytest ui_tests/
+```
+
+### 5. Run all tests
 
 ```bash
 python -m pytest
 ```
 
-Run tests with verbose output:
+### 6. Run smoke tests
 
 ```bash
-python -m pytest -v
+python -m pytest -m smoke
 ```
+
+## Allure Reporting
+
+The project uses Allure for test execution reporting.
+
+Generate test results:
+
+```bash
+python -m pytest --alluredir=allure-results
+```
+
+Generate and open the report locally:
+
+```bash
+allure serve allure-results
+```
+
+### Published Allure Report
+
+**[View Allure Test Report](https://arinaromanova0512bu-glitch.github.io/EducationProjectQA/)**
+
+The published report contains the results of 55 successfully executed automated tests.
 
 ## Configuration
 
 The API base URL can be configured using the `BASE_URL` environment variable.
-
-By default, the tests use:
-
-```text
-http://localhost:8080
-```
 
 Example:
 
@@ -87,6 +190,8 @@ BASE_URL=http://localhost:8080 python -m pytest
 
 ## About the Project
 
-This repository contains the test automation part of a training e-commerce project.
+This repository contains the automated testing component of a training e-commerce application.
 
-The backend application is maintained separately and is used as the system under test. The automated test suite is developed independently from the application source code.
+The backend application is maintained separately and serves as the system under test.
+
+The project was developed to practice API and UI test automation, test architecture, reusable components, and automated reporting.
